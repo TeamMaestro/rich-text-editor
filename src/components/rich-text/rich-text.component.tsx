@@ -572,7 +572,7 @@ export class HiveRichTextComponent {
         }
 
         return (
-            <div>
+            <div class="container">
                 {this.options && this.options.position === 'bottom' ?
                     <div class='container'>
                         <div class='text-container'>
