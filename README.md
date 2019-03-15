@@ -12,6 +12,12 @@ This web component allows you to add rich text editing to your applications.
 - `npm i @teamhive/rich-text-editor`
 
 ## Usage
+Somewhere in your project (e.g. `main.ts`):
+```
+import { defineCustomElements } from '@teamhive/rich-text-editor/dist/loader';
+defineCustomElements(window);
+```
+
 ```
 <hive-rich-text [options]="options"></hive-rich-text>
 ```
