@@ -37,7 +37,8 @@ export class HiveRichTextComponent {
 
     // customize
     @Prop() options: Partial<RichTextEditorOptions> = {
-        resize: true
+        dynamicSizing: true,
+        placeholder: 'Insert text...'
     };
 
     // states
@@ -48,6 +49,7 @@ export class HiveRichTextComponent {
     active: string;
     activeElement: HTMLElement;
     div: HTMLDivElement;
+    textContent: HTMLDivElement;
 
     // methods
     @Method()
@@ -58,15 +60,15 @@ export class HiveRichTextComponent {
         }
     }
 
+    @Method()
+    setContent(value: string) {
+        this.div.innerHTML = value;
+    }
+
     // listeners
     @Listen('document:mousedown', { passive: true })
     async mousedown(event: MouseEvent) {
         this.anchorEvent = event;
-    }
-
-    @Listen('document:resize', { passive: true })
-    async resize() {
-        console.log('RESIZE');
     }
 
     @Listen('document:keydown', { passive: true })
@@ -105,6 +107,8 @@ export class HiveRichTextComponent {
     // lifecycle
     componentDidLoad() {
         this.div = this.el.shadowRoot.getElementById('text-content') as HTMLDivElement;
+        this.textContent = this.el.shadowRoot.getElementById('text-content') as HTMLDivElement;
+
         this.customize();
     }
 
@@ -537,8 +541,11 @@ export class HiveRichTextComponent {
                 this.div.focus();
             }
 
-            if (this.options.resize) {
-                // checks for dynamic resizing
+            if (this.options.placeholder) {
+                this.textContent.setAttribute('placeholder', this.options.placeholder);
+            }
+
+            if (this.options.dynamicSizing) {
                 window.addEventListener('resize', () => {
                     this.div.parentElement.style.height = 'calc(' + this.height + ' - ' + toolbar.clientHeight + 'px)';
                     this.el.style.height = this.height;

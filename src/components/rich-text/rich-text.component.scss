@@ -1,28 +1,26 @@
-$background: #fff;
 
 :host {
-    --border-radius: 2px;
     --size: 25px;
 
     display: inline-block;
-    height: 500px;
-    width: 500px;
-    padding: 10px;
-    border: 1px solid darken($background, 18%);
+    height: auto;
+    width: auto;
+
+    border: 1px solid #d1d1d1;
+    background: var(--background);
     border-radius: var(--border-radius);
-    background: $background;
-    font-family: sans-serif;
-    letter-spacing: 1px;
+    font-family: var(--font-family);
 
     .container {
-        height: 100%;
-        width: 100%;
+        height: auto;
+        width: auto;
 
         .toolbar {
             display: flex;
             align-items: center;
             justify-content: flex-start;
             flex-wrap: wrap;
+            padding: 10px 5px;
 
             &.phantom {
                 opacity: 0;
@@ -51,8 +49,8 @@ $background: #fff;
                 user-select: none;
                 font-size: 14px;
 
-                color: darken($background, 25%);
-                fill: darken($background, 25%);
+                color: #bfbfbf;
+                fill: #bfbfbf;
 
                 svg {
                     height: calc(var(--size) / 2);
@@ -61,18 +59,18 @@ $background: #fff;
                 }
 
                 &:hover {
-                    background-color: darken($background, 5%);
+                    background-color: #f2f2f2;
                 }
 
                 &.active {
-                    background-color: darken($background, 50%);
+                    background-color: #808080;
 
                     &:hover {
-                        background-color: darken($background, 55%);
+                        background-color: #737373;
                     }
 
                     svg {
-                        fill: darken($background, 10%);
+                        fill: #e6e6e6;
                     }
                 }
             }
@@ -94,7 +92,7 @@ $background: #fff;
                         position: absolute;
                         width: 12px;
                         height: 12px;
-                        background: $background;
+                        background: var(--background);
                         transform: rotate(45deg) translate(-40%, 25%);
                         top: 7px;
                         left: 50%;
@@ -113,7 +111,7 @@ $background: #fff;
                     padding: 10px;
                     height: auto;
                     z-index: 10;
-                    background: $background;
+                    background: var(--background);
                     box-shadow: 0 0 2px 2px rgba(0, 0, 0, .15);
                     border-radius: var(--border-radius);
 
@@ -127,7 +125,7 @@ $background: #fff;
                         outline: none;
 
                         &::placeholder {
-                            color: darken($background, 18%);
+                            color: #d1d1d1;
                         }
                     }
 
@@ -152,7 +150,7 @@ $background: #fff;
 
             .vertical-divider {
                 width: 1px;
-                background-color: darken($background, 18%);
+                background-color: #d1d1d1;
                 height: var(--size);
                 margin: 0 5px;
             }
@@ -160,27 +158,17 @@ $background: #fff;
             .horizontal-divider {
                 width: 100%;
                 height: 1px;
-                background-color: darken($background, 18%);
-            }
-
-            &.top {
-                padding-bottom: 10px;
-            }
-
-            &.bottom {
-                padding-top: 10px;
+                background-color: #d1d1d1;
             }
         }
 
         .text-container {
-
             div {
                 display: inline-block;
 
                 height: 100%;
                 width: 100%;
-                overflow-x: visible;
-                overflow-y: scroll;
+                overflow: hidden scroll;
 
                 border: none;
                 outline: none;
@@ -189,9 +177,16 @@ $background: #fff;
                 -moz-box-shadow: none;
                 box-shadow: none;
 
-                resize: none;
                 background: transparent;
 
+                &:empty {
+                    &:not(:focus) {
+                        &:before {
+                            content: attr(placeholder);
+                            color: #ccc;
+                        }
+                    }
+                }
             }
         }
 

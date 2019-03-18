@@ -31,20 +31,22 @@ Where `options` can be populated with any of the following properties.
 |`colors`|`['#FF4541', '#E65100', '#43A047', '#1C9BE6', '#6446EB', '#ACACC2', '#626272']`|The colors that will show up for a quick selection when formating text color.|Any valid hex code|
 |`highlights`|`['#f3f315', '#ff0099', '#83f52c', '#ff6600', '#6e0dd0']`|The colors that will show up for a quick selection when formating highlight color.|Any valid hex code|
 |`position`|`top`|The position of the toolbar in relation to the text container.|`top` or `bottom`|
-|`content`|`null`|The content that will be loaded into the text container upon loading.|`plain text` and `html text` as a `string`|
+|`content`|`null`|The content that will be loaded into the text container upon loading.|`plain text` and/or `html text` as a `string`|
 |`height`|`100%`|The total height of the entire component. The text container will be equal to this subtracted by the toolbar height.|Any valid css|
+|`placeholder`|`Insert text...`|The text that will display when the rich editor is unfocused in the empty state.|`string`|
 |`width`|`100%`|The total width of the entire component.|Any valid css|
 |`border`|`1px solid #d1d1d1`|The border style that will show up.|Any valid css|
 |`borderRadius`|`2px`|The border radius that will be applied to entire component.|Any valid css.|
 |`phantom`|`false`|To hide the toolbar and reveal it upon hovering over the text component.|`boolean`|
-|`resize`|`true`|To constantly check if the component needs to dynamically be resized.|`boolean`|
+|`dynamicSizing`|`true`|To constantly check if the component needs to dynamically be resized.|`boolean`|
 |`autoFocus`|`false`|To focus on the text component upon init.|`boolean`|
 
 
 ### Methods
-|Event|Description|Return|
-:---|:---|:---
-|`getContent()`|To return the current contents of the editor.|`return: { text: 'Hive Rich Text Editor', html: '<b>Hive Rich Text Editor</b> }'`|
+|Event|Description|Values|Return|
+:---|:---|:---|:---
+|`getContent()`|To return the current contents of the editor.|`null`|`return: { text: 'Hive Rich Text Editor', html: '<b>Hive Rich Text Editor</b> }'`
+|`setContent(value: string)`|To set the content within the editor at any given time. Will override any and all values within the text editor.|`plain text` and/or `html text` as a `string`|`null`
 
 ---
 

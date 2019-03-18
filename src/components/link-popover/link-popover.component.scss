@@ -1,110 +1,108 @@
-$background: #fff;
-
 :host {
-  position: absolute;
-
-  .arrow {
-    width: 30px;
-    height: 12px;
     position: absolute;
-    overflow: hidden;
-    top: -12px;
-    left: -1px;
-    z-index: 15;
 
-    &:after {
-      content: "";
-      position: absolute;
-      width: 12px;
-      height: 12px;
-      background: #fff;
-      transform: rotate(45deg) translate(-40%, 25%);
-      top: 7px;
-      left: 50%;
-      box-shadow: 0 0 2px 2px rgba(0, 0, 0, .15);
-    }
-  }
+    .arrow {
+        width: 30px;
+        height: 12px;
+        position: absolute;
+        overflow: hidden;
+        top: -12px;
+        left: -1px;
+        z-index: 15;
 
-  .info-container {
-    top: var(--size);
-    left: -50%;
-
-    display: flex;
-    flex-wrap: wrap;
-    width: 250px;
-    height: auto;
-    padding: 5px 10px;
-    z-index: 10;
-    background: #fff;
-    box-shadow: 0 0 2px 2px rgba(0, 0, 0, .15);
-    border-radius: var(--border-radius);
-
-    font-size: 12px;
-    align-items: center;
-
-    input {
-      margin: 0;
-      width: 100%;
-      border: none;
-      outline: none;
-      padding: 10px 0;
-      border-bottom: 1px solid darken($background, 18%)
+        &:after {
+            content: "";
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: #fff;
+            transform: rotate(45deg) translate(-40%, 25%);
+            top: 7px;
+            left: 50%;
+            box-shadow: 0 0 2px 2px rgba(0, 0, 0, .15);
+        }
     }
 
-    input::placeholder {
-      color: darken($background, 18%);
-    }
+    .info-container {
+        top: var(--size);
+        left: -50%;
 
-    .button-container {
-      width: 100%;
-      display: flex;
-    }
+        display: flex;
+        flex-wrap: wrap;
+        width: 250px;
+        height: auto;
+        padding: 5px 10px;
+        z-index: 10;
+        background: #fff;
+        box-shadow: 0 0 2px 2px rgba(0, 0, 0, .15);
+        border-radius: var(--border-radius);
 
-    .button {
-      height: var(--size);
-      width: var(--size);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: var(--border-radius);
-      cursor: pointer;
-      text-transform: capitalize;
-      position: relative;
+        font-size: 12px;
+        align-items: center;
 
-      margin: 5px 2px 0 2px;
-
-      -webkit-touch-callout: none;
-      -webkit-user-select: none;
-      -khtml-user-select: none;
-      -moz-user-select: none;
-      -ms-user-select: none;
-      user-select: none;
-      font-size: 14px;
-
-      color: darken($background, 25%);
-      fill: darken($background, 25%);
-
-      svg {
-        height: calc(var(--size) / 2);
-        width: calc(var(--size) / 2);
-        fill: inherit;
-      }
-
-      &:hover {
-        background-color: darken($background, 5%);
-      }
-
-      &.active {
-        background-color: darken($background, 50%);
-
-        &:hover {
-          background-color: darken($background, 55%);
+        input {
+            margin: 0;
+            width: 100%;
+            border: none;
+            outline: none;
+            padding: 10px 0;
+            border-bottom: 1px solid #d1d1d1;
         }
 
-        svg {
-          fill: darken($background, 10%);
+        input::placeholder {
+            color: 1px solid #d1d1d1;
         }
-      }
+
+        .button-container {
+            width: 100%;
+            display: flex;
+        }
+
+        .button {
+            height: var(--size);
+            width: var(--size);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            text-transform: capitalize;
+            position: relative;
+
+            margin: 5px 2px 0 2px;
+
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            font-size: 14px;
+
+            color: #bfbfbf;
+            fill: #bfbfbf;
+
+            svg {
+                height: calc(var(--size) / 2);
+                width: calc(var(--size) / 2);
+                fill: inherit;
+            }
+
+            &:hover {
+                background-color: #f2f2f2;
+            }
+
+            &.active {
+                background-color: #808080;
+
+                &:hover {
+                    background-color: #737373;
+                }
+
+                svg {
+                    fill: #e6e6e6;
+                }
+            }
+        }
     }
-  }
 }
