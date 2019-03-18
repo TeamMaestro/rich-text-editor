@@ -160,14 +160,23 @@
                 height: 1px;
                 background-color: #d1d1d1;
             }
+
+            &.top {
+                padding-bottom: 0;
+            }
+
+            &.bottom {
+                padding-top: 0;
+            }
         }
 
         .text-container {
             div {
                 display: inline-block;
 
-                height: 100%;
-                width: 100%;
+                height: calc(100% - 20px);
+                width: calc(100% - 20px);
+                padding: 10px;
                 overflow: hidden scroll;
 
                 border: none;
