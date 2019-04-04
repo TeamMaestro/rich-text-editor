@@ -7,5 +7,15 @@ export const allowedConfig: string[] = [
     'strikethrough',
     'link',
     'textColor',
-    'backgroundColor'
+    'backgroundColor',
+    'undo',
+    'redo',
+    'superscript',
+    'subscript',
+    'insertOrderedList',
+    'insertUnorderedList',
+    // 'justifyFull',
+    // 'justifyCenter',
+    // 'justifyLeft',
+    // 'justifyRight'
 ]

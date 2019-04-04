@@ -1,6 +1,6 @@
 export class EditorUtils {
 
-  static isStyle(element: HTMLElement, tags: string[] = [], styles: string[] = []): Promise<boolean> {
+  static isStyle(element: HTMLElement, tags: string[] = [], styles: string[] = [], values: string[] = []): Promise<boolean> {
     return new Promise<boolean>(async (resolve) => {
       let res = false;
 
@@ -13,7 +13,11 @@ export class EditorUtils {
       }
 
       for (let i = 0; i < styles.length; i++) {
-        res = !!(element.style[styles[i]]);
+        if (values.length > 0) {
+          res = !!(element.style[styles[i]] === values[i])
+        } else {
+          res = !!(element.style[styles[i]]);
+        }
 
         if (res) {
           resolve(res);
