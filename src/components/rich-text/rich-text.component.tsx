@@ -13,17 +13,12 @@ export class HiveRichTextComponent {
 
     @Element() el: HTMLElement;
 
-    @State() bold = false;
-    @State() italic = false;
-    @State() underline = false;
-    @State() strikethrough = false;
-    @State() highlight = false;
+    @State() currentStates: string[] = [];
 
     @State() colorOpen = false;
     @State() highlightOpen = false;
-
-    @State() link = false;
     @State() linkPopoverOpen = false;
+
     linkPopover: HTMLHiveLinkPopoverElement;
 
     keycodeDown: number;
@@ -38,7 +33,12 @@ export class HiveRichTextComponent {
     // customize
     @Prop() options: Partial<RichTextEditorOptions> = {
         dynamicSizing: true,
-        placeholder: 'Insert text...'
+        placeholder: 'Insert text...',
+        // toolbar: [
+        //     'bold', 'italic', 'underline', 'strikethrough', '|', 'link', '|', 'color', 'highlight', '-',
+        //     'undo', 'redo', '|', 'superscript', 'subscript', '|', 'orderedList', 'unorderedList', '-',
+        //     'justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull'
+        // ]
     };
 
     // states
@@ -78,10 +78,10 @@ export class HiveRichTextComponent {
         } else if (this.keycodeDown === 91 || this.keycodeDown === 93) {
             switch (event.keyCode) {
                 case 66:
-                    this.setActiveState('bold', !this.bold);
+                    this.setActiveState('bold', !this.currentStates.includes('bold'));
                     break;
                 case 73:
-                    this.setActiveState('italic', !this.italic);
+                    this.setActiveState('italic', !this.currentStates.includes('italic'));
                     break;
             }
         }
@@ -151,6 +151,78 @@ export class HiveRichTextComponent {
                         </div>
                     this.addedToToolbar.push(component);
                     break;
+                case 'undo':
+                    element =
+                        <div class='button-container'>
+                            <div class={component + ' button'} onClick={() => this.onActionClick(component)}>
+                                {Icons[component]}
+                            </div>
+                        </div>
+                    this.addedToToolbar.push(component);
+                    break;
+                case 'redo':
+                    element =
+                        <div class='button-container'>
+                            <div class={component + ' button'} onClick={() => this.onActionClick(component)}>
+                                {Icons[component]}
+                            </div>
+                        </div>
+                    this.addedToToolbar.push(component);
+                    break;
+                case 'orderedList':
+                    element =
+                        <div class='button-container'>
+                            <div class={component + ' button'} onClick={() => this.onActionClick('insertOrderedList')}>
+                                {Icons[component]}
+                            </div>
+                        </div>
+                    this.addedToToolbar.push(component);
+                    break;
+                case 'unorderedList':
+                    element =
+                        <div class='button-container'>
+                            <div class={component + ' button'} onClick={() => this.onActionClick('insertUnorderedList')}>
+                                {Icons[component]}
+                            </div>
+                        </div>
+                    this.addedToToolbar.push(component);
+                    break;
+                case 'justifyFull':
+                    element =
+                        <div class='button-container'>
+                            <div class={component + ' button'} onClick={() => this.onActionClick(component, this.selection, true)}>
+                                {Icons[component]}
+                            </div>
+                        </div>
+                    this.addedToToolbar.push(component);
+                    break;
+                case 'justifyCenter':
+                    element =
+                        <div class='button-container'>
+                            <div class={component + ' button'} onClick={() => this.onActionClick(component, this.selection, true)}>
+                                {Icons[component]}
+                            </div>
+                        </div>
+                    this.addedToToolbar.push(component);
+                    break;
+                case 'justifyLeft':
+                    element =
+                        <div class='button-container'>
+                            <div class={component + ' button'} onClick={() => this.onActionClick(component, this.selection, true)}>
+                                {Icons[component]}
+                            </div>
+                        </div>
+                    this.addedToToolbar.push(component);
+                    break;
+                case 'justifyRight':
+                    element =
+                        <div class='button-container'>
+                            <div class={component + ' button'} onClick={() => this.onActionClick(component, this.selection, true)}>
+                                {Icons[component]}
+                            </div>
+                        </div>
+                    this.addedToToolbar.push(component);
+                    break;
                 default:
                     if (allowedConfig.includes(component)) {
                         element = <div class={component + ' button'} onClick={($event: UIEvent) => this.style(component, this.selection, $event)}>{Icons[component]}</div>
@@ -163,7 +235,7 @@ export class HiveRichTextComponent {
     }
 
     resetPopovers(exclude: string[] = []) {
-        if ((this.linkPopoverOpen || this.linkPopover) && !this.link) {
+        if ((this.linkPopoverOpen || this.linkPopover) && !this.currentStates.includes('link')) {
             this.removeLinkPopover();
         }
         if (!exclude.includes('color')) {
@@ -236,12 +308,7 @@ export class HiveRichTextComponent {
             const parentDiv: boolean = content.parentElement && content.parentElement.nodeName && content.parentElement.nodeName.toLowerCase() === 'div';
 
             if (parentDiv || content.parentElement) {
-                this.bold = false;
-                this.italic = false;
-                this.underline = false;
-                this.strikethrough = false;
-                this.link = false;
-                this.highlight = false;
+                this.currentStates = [];
 
                 (parentDiv) ?
                     await this.findStyle(content) :
@@ -285,7 +352,7 @@ export class HiveRichTextComponent {
         if (type === 'color') {
             this.colorOpen = value;
         } else if (type === 'highlight') {
-            if (this.highlight) {
+            if (this.currentStates.includes('highlight')) {
                 this.style('removeFormat', this.selection);
             } else {
                 this.highlightOpen = value;
@@ -318,7 +385,7 @@ export class HiveRichTextComponent {
 
     // links
     async onLinkClick(value: boolean) {
-        if (this.link) {
+        if (this.currentStates.includes('link')) {
             // if link is active then unlink
             this.style('unlink', this.selection);
         } else if (value) {
@@ -401,37 +468,97 @@ export class HiveRichTextComponent {
         }
     }
 
+    // other actions
+    onActionClick(component: string, selection?: Selection, alignment?: boolean) {
+
+        if (alignment && selection) {
+            const node = selection.anchorNode.parentNode as HTMLElement;
+            // console.log('NODE', node);
+            node.style.removeProperty('text-align');
+
+            document.execCommand(component);
+        } else {
+            document.execCommand(component);
+        }
+
+        this.checkStyles(selection);
+    }
+
+    // styling
     async checkStyles(selection: Selection) {
         if (selection && selection.anchorNode && selection.anchorNode.parentNode) {
             const node = selection.anchorNode.parentNode as HTMLElement;
 
+            const states = [];
+
             if (this.addedToToolbar.includes('bold')) {
-                this.bold = await EditorUtils.isStyle(node, ['b', 'strong'], ['fontWeight']);
-                this.setActiveState('bold', this.bold);
+                (await EditorUtils.isStyle(node, ['b', 'strong'], ['fontWeight'])) ? states.push('bold') : null;
+                this.setActiveState('bold', states.includes('bold'));
             }
 
             if (this.addedToToolbar.includes('italic')) {
-                this.italic = await EditorUtils.isStyle(node, ['i', 'em'], ['fontStyle']);
-                this.setActiveState('italic', this.italic);
+                (await EditorUtils.isStyle(node, ['i', 'em'], ['fontStyle'])) ? states.push('italic') : null;
+                this.setActiveState('italic', states.includes('italic'));
             }
 
             if (this.addedToToolbar.includes('underline')) {
-                this.underline = await EditorUtils.isStyle(node, ['u'], ['textDecoration']);
-                this.setActiveState('underline', this.underline);
+                (await EditorUtils.isStyle(node, ['u'], ['textDecoration'])) ? states.push('underline') : null;
+                this.setActiveState('underline', states.includes('underline'));
             }
 
             if (this.addedToToolbar.includes('strikethrough')) {
-                this.strikethrough = await EditorUtils.isStyle(node, ['strike'], ['textDecoration']);
-                this.setActiveState('strikethrough', this.strikethrough);
+                (await EditorUtils.isStyle(node, ['strike'], ['textDecoration'])) ? states.push('strikethrough') : null;
+                this.setActiveState('strikethrough', states.includes('strikethrough'));
+            }
+
+            if (this.addedToToolbar.includes('subscript')) {
+                (await EditorUtils.isStyle(node, ['sub'])) ? states.push('subscript') : null;
+                this.setActiveState('subscript', states.includes('subscript'));
+            }
+
+            if (this.addedToToolbar.includes('superscript')) {
+                (await EditorUtils.isStyle(node, ['sup'])) ? states.push('superscript') : null;
+                this.setActiveState('superscript', states.includes('superscript'));
+            }
+
+            if (this.addedToToolbar.includes('orderedList')) {
+                (await EditorUtils.isStyle(node, ['ol'])) ? states.push('orderedList') : null;
+                this.setActiveState('orderedList', states.includes('orderedList'));
+            }
+
+            if (this.addedToToolbar.includes('unorderedList')) {
+                (await EditorUtils.isStyle(node, ['ul'])) ? states.push('unorderedList') : null;
+                this.setActiveState('unorderedList', states.includes('unorderedList'));
+            }
+
+            if (this.addedToToolbar.includes('justifyFull')) {
+                (await EditorUtils.isStyle(node, [], ['textAlign'], ['justify'])) ? states.push('justifyFull') : null;
+                this.setActiveState('justifyFull', states.includes('justifyFull'));
+            }
+
+            if (this.addedToToolbar.includes('justifyCenter')) {
+                (await EditorUtils.isStyle(node, [], ['textAlign'], ['center'])) ? states.push('justifyCenter') : null;
+                this.setActiveState('justifyCenter', states.includes('justifyCenter'));
+            }
+
+            if (this.addedToToolbar.includes('justifyRight')) {
+                (await EditorUtils.isStyle(node, [], ['textAlign'], ['right'])) ? states.push('justifyRight') : null;
+                this.setActiveState('justifyRight', states.includes('justifyRight'));
+            }
+
+            if (this.addedToToolbar.includes('justifyLeft')) {
+                (await EditorUtils.isStyle(node, [], ['textAlign'], ['left'])) ? states.push('justifyLeft') : null;
+                this.setActiveState('justifyLeft', states.includes('justifyLeft'));
             }
 
             if (this.addedToToolbar.includes('link')) {
-                this.link = await EditorUtils.isStyle(node, ['a']);
-                this.setActiveState('link', this.link, node);
+                (await EditorUtils.isStyle(node, ['a'])) ? states.push('link') : null;
+                this.setActiveState('link', states.includes('link'), node);
             }
 
             if (this.addedToToolbar.includes('highlight')) {
-                this.highlight = await EditorUtils.isStyle(node, [], ['backgroundColor']);
+                (await EditorUtils.isStyle(node, [], ['background-color'])) ? states.push('highlight') : null;
+
                 const highlightButton = this.el.shadowRoot.getElementById('highlight');
                 if (node.style.backgroundColor && highlightButton) {
                     highlightButton.style.fill = node.style.backgroundColor;
@@ -441,6 +568,8 @@ export class HiveRichTextComponent {
             }
 
             if (this.addedToToolbar.includes('color')) {
+                (await EditorUtils.isStyle(node, [], ['color'])) ? states.push('color') : null;
+
                 const colorButton = this.el.shadowRoot.getElementById('color');
                 if ((node as HTMLFontElement).color && colorButton) {
                     colorButton.style.fill = (node as HTMLFontElement).color;
@@ -448,6 +577,8 @@ export class HiveRichTextComponent {
                     colorButton.style.fill = null;
                 }
             }
+
+            this.currentStates = states;
         }
     }
 

@@ -188,6 +188,11 @@
 
                 background: transparent;
 
+                ol, ul, div {
+                    margin: 0;
+                    padding: 0;
+                }
+
                 &:empty {
                     &:not(:focus) {
                         &:before {
