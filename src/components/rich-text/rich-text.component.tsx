@@ -398,7 +398,7 @@ export class HiveRichTextComponent {
                 this.selection = this.el.shadowRoot.getSelection();
             }
 
-            if (this.selection.type === 'Caret') {
+            if (this.selection && this.selection.type === 'Caret') {
                 const anchor = document.createElement('a');
                 anchor.href = window.location.href;
 
@@ -621,7 +621,12 @@ export class HiveRichTextComponent {
                 return;
             }
 
-            this.selectionRange = this.selection.getRangeAt(0);
+            if (this.selection && this.selection.rangeCount > 0) {
+                this.selectionRange = this.selection.getRangeAt(0);
+            } else {
+                this.selection = null;
+            }
+
             resolve();
         });
     }
