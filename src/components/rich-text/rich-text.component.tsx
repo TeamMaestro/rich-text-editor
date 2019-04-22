@@ -20,6 +20,8 @@ export class HiveRichTextComponent {
     @State() linkPopoverOpen = false;
 
     linkPopover: HTMLHiveLinkPopoverElement;
+    linkNode: Node;
+    creatingLink: boolean;
 
     keycodeDown: number;
     addedToToolbar: string[] = [];
@@ -33,12 +35,7 @@ export class HiveRichTextComponent {
     // customize
     @Prop() options: Partial<RichTextEditorOptions> = {
         dynamicSizing: true,
-        placeholder: 'Insert text...',
-        // toolbar: [
-        //     'bold', 'italic', 'underline', 'strikethrough', '|', 'link', '|', 'color', 'highlight', '-',
-        //     'undo', 'redo', '|', 'superscript', 'subscript', '|', 'orderedList', 'unorderedList', '-',
-        //     'justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull'
-        // ]
+        placeholder: 'Insert text...'
     };
 
     // states
@@ -128,7 +125,7 @@ export class HiveRichTextComponent {
                             <div id={component} class={component + ' button'} onClick={() => this.onColorClick(!this.colorOpen, 'color')}>
                                 {Icons.color}
                             </div>
-                            <hive-color-popover hidden={!this.colorOpen} isOpen={this.colorOpen} colors={this.colors} onColorSelected={($event: CustomEvent<string>) => this.submitInput('color', $event.detail)}></hive-color-popover>
+                            <hive-color-popover hidden={!this.colorOpen} position={this.options.position} isOpen={this.colorOpen} colors={this.colors} onColorSelected={($event: CustomEvent<string>) => this.submitInput('color', $event.detail)}></hive-color-popover>
                         </div>
                     this.addedToToolbar.push(component);
                     break;
@@ -138,7 +135,7 @@ export class HiveRichTextComponent {
                             <div id={component} class={component + ' button'} onClick={() => this.onColorClick(!this.highlightOpen, 'highlight')}>
                                 {Icons.highlight}
                             </div>
-                            <hive-color-popover hidden={!this.highlightOpen} isOpen={this.highlightOpen} colors={this.highlights} onColorSelected={($event: CustomEvent<string>) => this.submitInput('highlight', $event.detail)}></hive-color-popover>
+                            <hive-color-popover hidden={!this.highlightOpen} position={this.options.position} isOpen={this.highlightOpen} colors={this.highlights} onColorSelected={($event: CustomEvent<string>) => this.submitInput('highlight', $event.detail)}></hive-color-popover>
                         </div>
                     this.addedToToolbar.push(component);
                     break;
@@ -398,23 +395,26 @@ export class HiveRichTextComponent {
                 this.selection = this.el.shadowRoot.getSelection();
             }
 
+
             if (this.selection && this.selection.type === 'Caret') {
                 const anchor = document.createElement('a');
                 anchor.href = window.location.href;
 
                 this.selection.getRangeAt(0).insertNode(anchor);
-                this.createLinkPopover(anchor);
+
+                this.createLinkPopover(anchor, true);
             } else {
+                this.creatingLink = true;
                 await this.style('createLink', this.selection, null, true, window.location.href);
             }
         }
     }
 
-    createLinkPopover(node: Node) {
+    createLinkPopover(node: Node, creating: boolean) {
         this.linkPopover = document.createElement('hive-link-popover') as HTMLHiveLinkPopoverElement;
 
         if (!(node as HTMLAnchorElement).href) {
-            this.createLinkPopover(node.parentElement);
+            this.createLinkPopover(node.parentElement, creating);
         } else {
             this.linkPopover.addEventListener('action', (event: CustomEvent) => {
                 this.linkActionHandler(event.detail, node as HTMLAnchorElement);
@@ -426,45 +426,61 @@ export class HiveRichTextComponent {
             this.linkPopover.style.top = (top) + 'px';
             this.linkPopover.style.left = (left) + 'px';
 
+            this.linkPopover.creating = creating;
             this.linkPopover.url = (node as HTMLAnchorElement).href;
             this.linkPopover.text = (node as HTMLAnchorElement).innerText;
+
             this.el.shadowRoot.appendChild(this.linkPopover);
+
+            this.creatingLink = false;
         }
     }
 
     removeLinkPopover() {
-        this.linkPopoverOpen = false;
-        this.linkPopover.remove();
-        this.linkPopover = null;
+        if (this.linkPopover) {
+            this.linkPopoverOpen = false;
+            this.linkPopover.remove();
+            this.linkPopover = null;
+            this.linkNode = null;
+        }
     }
 
     async linkActionHandler({ action, url, text }, node: HTMLAnchorElement) {
         this.linkPopoverOpen = false;
         this.linkPopover.remove();
 
-        if (!text || !url) {
+        if (!text) {
             node.remove();
-        }
+        } else if (!url) {
+            node.replaceWith(node.text);
+            this.checkStyles(this.selection);
+            this.selectionRange = null;
+            this.focus();
+        } else {
+            switch (action) {
+                case 'destroy':
+                    node.remove();
+                    break;
+                case 'edit':
+                    if (!url.startsWith('https://') && !url.startsWith('http://')) {
+                        url = 'http://' + url;
+                    }
 
-        switch (action) {
-            case 'destroy':
-                node.remove();
-                break;
-            case 'edit':
-                node.innerText = text;
-                node.href = url;
-                this.selectionRange = null;
-                this.focus();
-                break;
-            case 'unlink':
-                node.replaceWith(node.text);
-                this.checkStyles(this.selection);
-                this.selectionRange = null;
-                this.focus();
-                break;
-            case 'open':
-                window.open(node.href, '_blank');
-                break;
+                    node.innerText = text;
+                    node.href = url;
+                    this.selectionRange = null;
+                    this.focus();
+                    break;
+                case 'unlink':
+                    node.replaceWith(node.text);
+                    this.checkStyles(this.selection);
+                    this.selectionRange = null;
+                    this.focus();
+                    break;
+                case 'open':
+                    window.open(node.href, '_blank');
+                    break;
+            }
         }
     }
 
@@ -473,7 +489,6 @@ export class HiveRichTextComponent {
 
         if (alignment && selection) {
             const node = selection.anchorNode.parentNode as HTMLElement;
-            // console.log('NODE', node);
             node.style.removeProperty('text-align');
 
             document.execCommand(component);
@@ -553,6 +568,15 @@ export class HiveRichTextComponent {
 
             if (this.addedToToolbar.includes('link')) {
                 (await EditorUtils.isStyle(node, ['a'])) ? states.push('link') : null;
+
+                if (this.linkNode !== node) {
+                    if (this.linkNode) {
+                        this.removeLinkPopover();
+                    }
+
+                    this.linkNode = node;
+                }
+
                 this.setActiveState('link', states.includes('link'), node);
             }
 
@@ -568,9 +592,9 @@ export class HiveRichTextComponent {
             }
 
             if (this.addedToToolbar.includes('color')) {
+                const colorButton = this.el.shadowRoot.getElementById('color');
                 (await EditorUtils.isStyle(node, [], ['color'])) ? states.push('color') : null;
 
-                const colorButton = this.el.shadowRoot.getElementById('color');
                 if ((node as HTMLFontElement).color && colorButton) {
                     colorButton.style.fill = (node as HTMLFontElement).color;
                 } else {
@@ -590,7 +614,7 @@ export class HiveRichTextComponent {
 
             if (component === 'link' && node && !this.linkPopoverOpen) {
                 this.linkPopoverOpen = true;
-                this.createLinkPopover(node);
+                this.createLinkPopover(node, this.creatingLink);
             }
 
         } else if (!value && button) {
@@ -669,8 +693,22 @@ export class HiveRichTextComponent {
                 this.el.style.borderRadius = this.options.borderRadius;
             }
 
-            if (this.options.phantom) {
+            if (this.options.showToolbar === 'onHover') {
                 toolbar.className += ' phantom';
+            } else if (this.options.showToolbar === 'onSelect') {
+                if (!toolbar.className.includes('selection')) {
+                    toolbar.className += ' selection';
+                }
+
+                this.el.onfocus = () => {
+                    if (!toolbar.className.includes('show')) {
+                        toolbar.className += ' show';
+                    }
+                }
+
+                this.el.onblur = () => {
+                    toolbar.classList.remove('show');
+                }
             }
 
             if (this.options.autoFocus) {

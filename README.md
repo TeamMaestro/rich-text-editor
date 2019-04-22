@@ -37,7 +37,7 @@ Where `options` can be populated with any of the following properties.
 |`width`|`100%`|The total width of the entire component.|Any valid css|
 |`border`|`1px solid #d1d1d1`|The border style that will show up.|Any valid css|
 |`borderRadius`|`2px`|The border radius that will be applied to entire component.|Any valid css.|
-|`phantom`|`false`|To hide the toolbar and reveal it upon hovering over the text component.|`boolean`|
+|`showToolbar`|`always`|How the toolbar should be shown or hidden based on user actions |`always`, `onHover`, or `onSelect`|
 |`dynamicSizing`|`true`|To constantly check if the component needs to dynamically be resized.|`boolean`|
 |`autoFocus`|`false`|To focus on the text component upon init.|`boolean`|
 

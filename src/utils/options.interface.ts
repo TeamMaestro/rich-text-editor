@@ -14,7 +14,11 @@ export interface RichTextEditorOptions {
     border: string; // styling of the border for the host component
     borderRadius: string; // styling of the border for the host component
     
-    phantom: boolean; // only have the toolbar appear when you are hovering over the text container
-    dynamicSizing: boolean; // checks when the window resizes to resize the editor 
+    showToolbar: 
+        'always' | // always show the toolbar. Default behavior
+        'onHover' | // only have the toolbar appear when you are hovering over the text container
+        'onSelect'; // only have the toolbar appear when you are focused on the textarea
+    
+        dynamicSizing: boolean; // checks when the window resizes to resize the editor 
     autoFocus: boolean;
 }

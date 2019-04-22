@@ -9,6 +9,7 @@ export class ColorPopoverComponent {
 
   @Element() el: HTMLElement;
   @Prop() colors: string[];
+  @Prop() position: 'top' | 'bottom';
   activeColor: string;
 
   @Prop() isOpen: boolean;
@@ -44,6 +45,12 @@ export class ColorPopoverComponent {
     const input = this.el.shadowRoot.getElementById('color-input') as HTMLInputElement;
     const hexColorSelector = this.el.shadowRoot.getElementById('hex-color-selector');
 
+    if (!input.value.startsWith('#')) {
+      input.value = '#' + input.value;
+    } else if (input.value.startsWith('##')) {
+      input.value = '#' + input.value.substring(2);
+    }
+
     // if the color isn't valid then it defaults to white. Default color subject to change
     if (this.colorValidation.test(input.value)) {
       hexColorSelector.style.backgroundColor = input.value;
@@ -64,8 +71,8 @@ export class ColorPopoverComponent {
   render() {
     return (
       <div>
-        <div class='arrow'></div>
-        <div class='input-container'>
+        <div class={this.position + ' arrow'}></div>
+        <div class={this.position + ' input-container'}>
           <div class='color-selector-container'>
             {this.colors.map((color) => {
               const style = {
