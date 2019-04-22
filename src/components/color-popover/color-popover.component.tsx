@@ -44,6 +44,12 @@ export class ColorPopoverComponent {
     const input = this.el.shadowRoot.getElementById('color-input') as HTMLInputElement;
     const hexColorSelector = this.el.shadowRoot.getElementById('hex-color-selector');
 
+    if (!input.value.startsWith('#')) {
+      input.value = '#' + input.value;
+    } else if (input.value.startsWith('##')) {
+      input.value = '#' + input.value.substring(2);
+    }
+
     // if the color isn't valid then it defaults to white. Default color subject to change
     if (this.colorValidation.test(input.value)) {
       hexColorSelector.style.backgroundColor = input.value;

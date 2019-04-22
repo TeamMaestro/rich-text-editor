@@ -33,12 +33,7 @@ export class HiveRichTextComponent {
     // customize
     @Prop() options: Partial<RichTextEditorOptions> = {
         dynamicSizing: true,
-        placeholder: 'Insert text...',
-        // toolbar: [
-        //     'bold', 'italic', 'underline', 'strikethrough', '|', 'link', '|', 'color', 'highlight', '-',
-        //     'undo', 'redo', '|', 'superscript', 'subscript', '|', 'orderedList', 'unorderedList', '-',
-        //     'justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull'
-        // ]
+        placeholder: 'Insert text...'
     };
 
     // states
@@ -444,27 +439,31 @@ export class HiveRichTextComponent {
 
         if (!text || !url) {
             node.remove();
-        }
+        } else {
+            switch (action) {
+                case 'destroy':
+                    node.remove();
+                    break;
+                case 'edit':
+                    if (!url.startsWith('https://') && !url.startsWith('http://')) {
+                        url = 'http://' + url;
+                    }
 
-        switch (action) {
-            case 'destroy':
-                node.remove();
-                break;
-            case 'edit':
-                node.innerText = text;
-                node.href = url;
-                this.selectionRange = null;
-                this.focus();
-                break;
-            case 'unlink':
-                node.replaceWith(node.text);
-                this.checkStyles(this.selection);
-                this.selectionRange = null;
-                this.focus();
-                break;
-            case 'open':
-                window.open(node.href, '_blank');
-                break;
+                    node.innerText = text;
+                    node.href = url;
+                    this.selectionRange = null;
+                    this.focus();
+                    break;
+                case 'unlink':
+                    node.replaceWith(node.text);
+                    this.checkStyles(this.selection);
+                    this.selectionRange = null;
+                    this.focus();
+                    break;
+                case 'open':
+                    window.open(node.href, '_blank');
+                    break;
+            }
         }
     }
 
@@ -473,7 +472,6 @@ export class HiveRichTextComponent {
 
         if (alignment && selection) {
             const node = selection.anchorNode.parentNode as HTMLElement;
-            // console.log('NODE', node);
             node.style.removeProperty('text-align');
 
             document.execCommand(component);
@@ -568,9 +566,9 @@ export class HiveRichTextComponent {
             }
 
             if (this.addedToToolbar.includes('color')) {
+                const colorButton = this.el.shadowRoot.getElementById('color');
                 (await EditorUtils.isStyle(node, [], ['color'])) ? states.push('color') : null;
 
-                const colorButton = this.el.shadowRoot.getElementById('color');
                 if ((node as HTMLFontElement).color && colorButton) {
                     colorButton.style.fill = (node as HTMLFontElement).color;
                 } else {
@@ -669,8 +667,22 @@ export class HiveRichTextComponent {
                 this.el.style.borderRadius = this.options.borderRadius;
             }
 
-            if (this.options.phantom) {
+            if (this.options.showToolbar === 'onHover') {
                 toolbar.className += ' phantom';
+            } else if (this.options.showToolbar === 'onSelect') {
+                if (!toolbar.className.includes('selection')) {
+                    toolbar.className += ' selection';
+                }
+
+                this.div.onfocus = () => {
+                    if (!toolbar.className.includes('show')) {
+                        toolbar.className += ' show';
+                    }
+                }
+
+                this.div.onblur = () => {
+                    toolbar.classList.remove('show');
+                }
             }
 
             if (this.options.autoFocus) {

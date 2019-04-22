@@ -25,14 +25,20 @@ export class LinkPopoverComponent {
       const linkInput = this.el.shadowRoot.getElementById('link-input') as HTMLInputElement;
       const textInput = this.el.shadowRoot.getElementById('text-input') as HTMLInputElement;
 
-      let text = this.url;
-      if (textInput && !!textInput.value) {
-        text = textInput.value;
-      } else if (!!this.text) {
-        text = this.text;
+      let text;
+
+      if (linkInput && !!linkInput.value) {
+        text = linkInput.value;
+        if (textInput && !!textInput.value) {
+          text = textInput.value;
+        } else if (!!this.text) {
+          text = this.text;
+        }
+        this.actionHandler('edit', linkInput.value, text);
+      } else {
+        this.actionHandler('destroy', null, null);
       }
 
-      this.actionHandler('edit', linkInput.value, text);
     }
   }
 
@@ -47,7 +53,7 @@ export class LinkPopoverComponent {
       <div>
         <div class='arrow'></div>
         <div class='info-container'>
-          <input id="link-input" placeholder="https://" autoFocus value={this.url} onKeyUp={($event: KeyboardEvent) => this.handleKeyUp($event)}></input>
+          <input id="link-input" placeholder="https://" autoFocus value={(!this.text) ? null : this.url} onKeyUp={($event: KeyboardEvent) => this.handleKeyUp($event)}></input>
           {(!this.text) ?
             <input id="text-input" placeholder="Text to display" value={this.text} onKeyUp={($event: KeyboardEvent) => this.handleKeyUp($event)}></input>
             : null
