@@ -700,13 +700,13 @@ export class HiveRichTextComponent {
                     toolbar.className += ' selection';
                 }
 
-                this.div.onfocus = () => {
+                this.el.onfocus = () => {
                     if (!toolbar.className.includes('show')) {
                         toolbar.className += ' show';
                     }
                 }
 
-                this.div.onblur = () => {
+                this.el.onblur = () => {
                     toolbar.classList.remove('show');
                 }
             }

@@ -38,7 +38,7 @@ export class LinkPopoverComponent {
         }
         this.actionHandler('edit', this.linkInput.value, text);
       } else {
-        this.actionHandler('destroy', null, null);
+        this.actionHandler('destroy', null, this.text);
       }
     }
   }
