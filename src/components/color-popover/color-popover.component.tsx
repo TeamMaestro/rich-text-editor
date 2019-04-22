@@ -9,6 +9,7 @@ export class ColorPopoverComponent {
 
   @Element() el: HTMLElement;
   @Prop() colors: string[];
+  @Prop() position: 'top' | 'bottom';
   activeColor: string;
 
   @Prop() isOpen: boolean;
@@ -70,8 +71,8 @@ export class ColorPopoverComponent {
   render() {
     return (
       <div>
-        <div class='arrow'></div>
-        <div class='input-container'>
+        <div class={this.position + ' arrow'}></div>
+        <div class={this.position + ' input-container'}>
           <div class='color-selector-container'>
             {this.colors.map((color) => {
               const style = {

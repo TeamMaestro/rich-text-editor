@@ -12,7 +12,12 @@ export class LinkPopoverComponent {
 
   @Prop() url: string;
   @Prop() text: string;
+  @Prop() creating: boolean;
+
   submit: boolean;
+
+  linkInput: HTMLInputElement;
+  textInput: HTMLInputElement;
 
   @Event() public action: EventEmitter;
   actionHandler(action: string, url: string, text: string) {
@@ -22,29 +27,33 @@ export class LinkPopoverComponent {
 
   handleKeyUp(event: KeyboardEvent) {
     if (event.keyCode === 13) {
-      const linkInput = this.el.shadowRoot.getElementById('link-input') as HTMLInputElement;
-      const textInput = this.el.shadowRoot.getElementById('text-input') as HTMLInputElement;
-
       let text;
 
-      if (linkInput && !!linkInput.value) {
-        text = linkInput.value;
-        if (textInput && !!textInput.value) {
-          text = textInput.value;
+      if (this.linkInput && this.linkInput.value) {
+        text = this.linkInput.value;
+        if (this.textInput && !!this.textInput.value) {
+          text = this.textInput.value;
         } else if (!!this.text) {
           text = this.text;
         }
-        this.actionHandler('edit', linkInput.value, text);
+        this.actionHandler('edit', this.linkInput.value, text);
       } else {
         this.actionHandler('destroy', null, null);
       }
-
     }
   }
 
   componentDidUnload() {
-    if (!this.submit && !this.text) {
-      this.actionHandler('destroy', null, null);
+    if (!this.submit && (!this.text || !this.linkInput.value)) {
+      this.actionHandler('destroy', null, this.text);
+    }
+  }
+
+  componentDidLoad() {
+    this.linkInput = this.el.shadowRoot.getElementById('link-input') as HTMLInputElement;
+
+    if (!this.text) {
+      this.textInput = this.el.shadowRoot.getElementById('text-input') as HTMLInputElement;
     }
   }
 
@@ -53,7 +62,7 @@ export class LinkPopoverComponent {
       <div>
         <div class='arrow'></div>
         <div class='info-container'>
-          <input id="link-input" placeholder="https://" autoFocus value={(!this.text) ? null : this.url} onKeyUp={($event: KeyboardEvent) => this.handleKeyUp($event)}></input>
+          <input id="link-input" placeholder="https://" autoFocus value={(this.creating) ? null : this.url} onKeyUp={($event: KeyboardEvent) => this.handleKeyUp($event)}></input>
           {(!this.text) ?
             <input id="text-input" placeholder="Text to display" value={this.text} onKeyUp={($event: KeyboardEvent) => this.handleKeyUp($event)}></input>
             : null

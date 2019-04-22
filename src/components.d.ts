@@ -18,18 +18,22 @@ export namespace Components {
   interface HiveColorPopover {
     'colors': string[];
     'isOpen': boolean;
+    'position': 'top' | 'bottom';
   }
   interface HiveColorPopoverAttributes extends StencilHTMLAttributes {
     'colors'?: string[];
     'isOpen'?: boolean;
     'onColorSelected'?: (event: CustomEvent) => void;
+    'position'?: 'top' | 'bottom';
   }
 
   interface HiveLinkPopover {
+    'creating': boolean;
     'text': string;
     'url': string;
   }
   interface HiveLinkPopoverAttributes extends StencilHTMLAttributes {
+    'creating'?: boolean;
     'onAction'?: (event: CustomEvent) => void;
     'text'?: string;
     'url'?: string;
