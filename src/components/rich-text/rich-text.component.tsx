@@ -110,12 +110,6 @@ export class HiveRichTextComponent {
         this.customize();
     }
 
-    componentDidUpdate() {
-        if (this.options.dynamicSizing) {
-            this.resize();
-        }
-    }
-
     determineComponent(component: string) {
         let element;
         if (!this.addedToToolbar.includes(component)) {
@@ -727,9 +721,9 @@ export class HiveRichTextComponent {
             }
 
             if (this.options.dynamicSizing) {
-                window.addEventListener('resize', () => {
+                window.onresize = () => {
                     this.resize();
-                });
+                }
             }
         }
 
@@ -737,6 +731,7 @@ export class HiveRichTextComponent {
     }
 
     // takes the inputed height and adds the toolbar height in order to get the correct height of the host
+    @Method()
     resize() {
         this.div.parentElement.style.height = 'calc(' + this.height + ' - ' + this.toolbarRef.clientHeight + 'px)';
         this.el.style.height = this.height;

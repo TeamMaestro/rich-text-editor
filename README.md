@@ -47,6 +47,7 @@ Where `options` can be populated with any of the following properties.
 :---|:---|:---|:---
 |`getContent()`|To return the current contents of the editor.|`null`|`return: { text: 'Hive Rich Text Editor', html: '<b>Hive Rich Text Editor</b> }'`
 |`setContent(value: string)`|To set the content within the editor at any given time. Will override any and all values within the text editor.|`plain text` and/or `html text` as a `string`|`null`
+|`resize()`|To resize the entire rich text editor. May be needed when used within modals or other entry components.| none | `null`
 
 ---
 

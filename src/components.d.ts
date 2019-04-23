@@ -42,6 +42,7 @@ export namespace Components {
   interface HiveRichText {
     'getContent': () => Promise<{ text: string; html: string; }>;
     'options': Partial<RichTextEditorOptions>;
+    'resize': () => void;
     'setContent': (value: string) => void;
   }
   interface HiveRichTextAttributes extends StencilHTMLAttributes {
