@@ -22,6 +22,7 @@ export class HiveRichTextComponent {
     linkPopover: HTMLHiveLinkPopoverElement;
     linkNode: Node;
     creatingLink: boolean;
+    toolbarRef: HTMLElement;
 
     keycodeDown: number;
     addedToToolbar: string[] = [];
@@ -670,7 +671,7 @@ export class HiveRichTextComponent {
 
     // visuals
     customize() {
-        const toolbar = this.el.shadowRoot.getElementById('toolbar');
+        this.toolbarRef = this.el.shadowRoot.getElementById('toolbar');
 
         if (this.options) {
             if (this.options.content) {
@@ -694,20 +695,20 @@ export class HiveRichTextComponent {
             }
 
             if (this.options.showToolbar === 'onHover') {
-                toolbar.className += ' phantom';
+                this.toolbarRef.className += ' phantom';
             } else if (this.options.showToolbar === 'onSelect') {
-                if (!toolbar.className.includes('selection')) {
-                    toolbar.className += ' selection';
+                if (!this.toolbarRef.className.includes('selection')) {
+                    this.toolbarRef.className += ' selection';
                 }
 
                 this.el.onfocus = () => {
-                    if (!toolbar.className.includes('show')) {
-                        toolbar.className += ' show';
+                    if (!this.toolbarRef.className.includes('show')) {
+                        this.toolbarRef.className += ' show';
                     }
                 }
 
                 this.el.onblur = () => {
-                    toolbar.classList.remove('show');
+                    this.toolbarRef.classList.remove('show');
                 }
             }
 
@@ -720,19 +721,21 @@ export class HiveRichTextComponent {
             }
 
             if (this.options.dynamicSizing) {
-                window.addEventListener('resize', () => {
-                    this.div.parentElement.style.height = 'calc(' + this.height + ' - ' + toolbar.clientHeight + 'px)';
-                    this.el.style.height = this.height;
-                    this.el.style.width = this.width;
-                });
+                window.onresize = () => {
+                    this.resize();
+                }
             }
         }
 
-        // takes the inputed height and adds the toolbar height in order to get the correct height of the host
-        this.div.parentElement.style.height = 'calc(' + this.height + ' - ' + toolbar.clientHeight + 'px)';
+        this.resize();
+    }
+
+    // takes the inputed height and adds the toolbar height in order to get the correct height of the host
+    @Method()
+    resize() {
+        this.div.parentElement.style.height = 'calc(' + this.height + ' - ' + this.toolbarRef.clientHeight + 'px)';
         this.el.style.height = this.height;
         this.el.style.width = this.width;
-
     }
 
     render() {
