@@ -284,11 +284,23 @@ export class HiveRichTextComponent {
                     this.el.shadowRoot.getSelection().empty();
                     this.el.shadowRoot.getSelection().addRange(range);
                 } else {
-                    this.selectionRange = selection.getRangeAt(0);
-                    this.selection = selection;
-                    
-                    document.execCommand(component, showUI, value);
-                    this.div.focus();
+                    let cursor = this.div.querySelector('.hive-cursor') as HTMLSpanElement;
+                    if (cursor) {
+                        const parentNode = cursor.parentNode as HTMLElement;
+                        parentNode.remove();
+
+                        this.selectionRange = selection.getRangeAt(0);
+                        this.selection = selection;
+                        this.div.focus();
+
+                        this.checkStyles(selection);
+                    } else {
+                        this.selectionRange = selection.getRangeAt(0);
+                        this.selection = selection;
+
+                        document.execCommand(component, showUI, value);
+                        this.div.focus();
+                    }
                 }
             } else {
                 await this.applyStyle(selection, component, showUI, value);
