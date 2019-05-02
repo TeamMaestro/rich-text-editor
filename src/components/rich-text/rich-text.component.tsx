@@ -47,14 +47,15 @@ export class HiveRichTextComponent {
     active: string;
     activeElement: HTMLElement;
     div: HTMLDivElement;
-    textContent: HTMLDivElement;
+
+    emptySpace = '&#65279';
 
     // methods
     @Method()
     async getContent() {
         return {
             text: this.div.innerText,
-            html: this.div.innerHTML
+            html: this.div.innerHTML.replace(/&nbsp;/g, ' ')
         }
     }
 
@@ -76,10 +77,14 @@ export class HiveRichTextComponent {
         } else if (this.keycodeDown === 91 || this.keycodeDown === 93) {
             switch (event.keyCode) {
                 case 66:
-                    this.setActiveState('bold', !this.currentStates.includes('bold'));
+                    this.toggleActiveState('bold');
                     break;
                 case 73:
-                    this.setActiveState('italic', !this.currentStates.includes('italic'));
+                    this.toggleActiveState('italic');
+                    break;
+                case 85:
+                    this.style('underline', this.selection);
+                    this.toggleActiveState('underline');
                     break;
             }
         }
@@ -87,6 +92,21 @@ export class HiveRichTextComponent {
 
     @Listen('document:keyup', { passive: true })
     async keyup(event: KeyboardEvent) {
+        if (this.div) {
+            const cursor = this.div.querySelector('.hive-cursor') as HTMLSpanElement;
+            if (cursor) {
+                const parentNode = cursor.parentNode as HTMLElement;
+                parentNode.innerHTML = cursor.innerHTML.replace(/\uFEFF/g, '');
+                cursor.remove();
+
+                const range = document.createRange();
+                range.setStart(parentNode, 1);
+
+                this.el.shadowRoot.getSelection().empty();
+                this.el.shadowRoot.getSelection().addRange(range);
+            }
+        }
+
         if (event.keyCode === 91 || this.keycodeDown === 93) {
             this.keycodeDown = null;
         }
@@ -104,9 +124,6 @@ export class HiveRichTextComponent {
 
     // lifecycle
     componentDidLoad() {
-        this.div = this.el.shadowRoot.getElementById('text-content') as HTMLDivElement;
-        this.textContent = this.el.shadowRoot.getElementById('text-content') as HTMLDivElement;
-
         this.customize();
     }
 
@@ -247,18 +264,32 @@ export class HiveRichTextComponent {
     // styling
     style(component: string, selection: Selection, event?: UIEvent, showUI?: boolean, value?: string) {
         return new Promise<void>(async (resolve) => {
-            if (event) {
+            if (event !== null) {
                 event.stopPropagation();
             }
 
             this.resetPopovers();
 
-            if (!selection) {
-                selection = this.el.shadowRoot.getSelection();
-            }
-
             if (selection.type === 'Caret') {
-                this.focus();
+                if (!this.currentStates.includes(component)) {
+                    const newComponent = document.createElement(this.createComponent(component));
+                    newComponent.innerHTML = `<span class="hive-cursor">${this.emptySpace}</span>`;
+                    selection.getRangeAt(0).insertNode(newComponent);
+
+                    const cursor = this.div.querySelector('.hive-cursor') as HTMLSpanElement;
+
+                    const range = document.createRange();
+                    range.setStart(cursor, 1);
+
+                    this.el.shadowRoot.getSelection().empty();
+                    this.el.shadowRoot.getSelection().addRange(range);
+                } else {
+                    this.selectionRange = selection.getRangeAt(0);
+                    this.selection = selection;
+                    
+                    document.execCommand(component, showUI, value);
+                    this.div.focus();
+                }
             } else {
                 await this.applyStyle(selection, component, showUI, value);
                 await this.initStyle(selection);
@@ -266,6 +297,26 @@ export class HiveRichTextComponent {
 
             resolve();
         });
+    }
+
+    createComponent(component: string) {
+        let value = '';
+        switch (component) {
+            case 'bold':
+                value = 'b';
+                break;
+            case 'italic':
+                value = 'i';
+                break;
+            case 'underline':
+                value = 'u';
+                break;
+            case 'strikethrough':
+                value = 'strike';
+                break
+        }
+
+        return value;
     }
 
     private applyStyle(selection: Selection, style: string, showUI?: boolean, value?: string): Promise<void> {
@@ -627,9 +678,20 @@ export class HiveRichTextComponent {
         }
     }
 
+    toggleActiveState(component: string) {
+        const button = this.el.shadowRoot.querySelector('.' + component);
+
+        if (button.className.includes('active')) {
+            button.className = component + ' button';
+        } else {
+            button.className = component + ' button active';
+        }
+    }
+
     // helpers
     setSelection(): Promise<void> {
         return new Promise<void>(async (resolve) => {
+            // const selection: Selection = await this.el.shadowRoot.getSelection();
             const selection: Selection = await this.el.shadowRoot.getSelection();
             await this.checkStyles(selection);
 
@@ -717,7 +779,7 @@ export class HiveRichTextComponent {
             }
 
             if (this.options.placeholder) {
-                this.textContent.setAttribute('placeholder', this.options.placeholder);
+                this.div.setAttribute('placeholder', this.options.placeholder);
             }
 
             if (this.options.dynamicSizing) {
@@ -760,7 +822,7 @@ export class HiveRichTextComponent {
                 {this.options && this.options.position === 'bottom' ?
                     <div class='container'>
                         <div class='text-container'>
-                            <div id='text-content' contentEditable='true' onClick={() => this.resetPopovers()}></div>
+                            <div id='text-content' ref={(el: HTMLDivElement) => this.div = el} contentEditable='true' onClick={() => this.resetPopovers()}></div>
                         </div>
                         <div id='toolbar' class='toolbar bottom'>
                             {this.toolbar.map((bar) =>
@@ -776,7 +838,7 @@ export class HiveRichTextComponent {
                             )}
                         </div>
                         <div class='text-container'>
-                            <div id='text-content' contentEditable='true' onClick={() => this.resetPopovers()}></div>
+                            <div id='text-content' ref={(el: HTMLDivElement) => this.div = el} contentEditable='true' onClick={() => this.resetPopovers()}></div>
                         </div>
                     </div>
                 }

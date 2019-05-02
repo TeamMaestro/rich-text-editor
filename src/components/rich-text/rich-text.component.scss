@@ -165,4 +165,9 @@
             }
         }
     }
+
+    [contenteditable] {
+        -webkit-user-select: auto;
+        user-select: all;
+      }
 }
