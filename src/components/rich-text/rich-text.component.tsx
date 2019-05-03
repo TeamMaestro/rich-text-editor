@@ -703,7 +703,6 @@ export class HiveRichTextComponent {
     // helpers
     setSelection(): Promise<void> {
         return new Promise<void>(async (resolve) => {
-            // const selection: Selection = await this.el.shadowRoot.getSelection();
             const selection: Selection = await this.el.shadowRoot.getSelection();
             await this.checkStyles(selection);
 
