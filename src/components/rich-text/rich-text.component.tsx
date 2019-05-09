@@ -1,8 +1,8 @@
-import { Component, Element, Listen, Prop, State, Method } from '@stencil/core';
+import { Component, Element, Method, Prop, State } from '@stencil/core';
 import { allowedConfig } from '../../utils/allowed-config';
 import { EditorUtils } from '../../utils/editor-utils';
-import { Icons } from '../icons/icons';
 import { RichTextEditorOptions } from '../../utils/options.interface';
+import { Icons } from '../icons/icons';
 
 @Component({
     tag: 'hive-rich-text',
@@ -40,13 +40,12 @@ export class HiveRichTextComponent {
     };
 
     // states
-    selection: Selection = null;
-    selectionRange: Range = null;
     anchorEvent: MouseEvent | TouchEvent;
 
     active: string;
     activeElement: HTMLElement;
     div: HTMLDivElement;
+    iframe: HTMLIFrameElement;
 
     emptySpace = '&#65279';
 
@@ -54,24 +53,60 @@ export class HiveRichTextComponent {
     @Method()
     async getContent() {
         return {
-            text: this.div.innerText,
-            html: this.div.innerHTML.replace(/&nbsp;/g, ' ')
+            text: this.iframe.contentDocument.body.innerText,
+            html: this.iframe.contentDocument.body.innerHTML.replace(/&nbsp;/g, ' ')
         }
     }
 
     @Method()
     setContent(value: string) {
-        this.div.innerHTML = value;
+        this.iframe.contentDocument.body.innerHTML = value;
+        setTimeout(() => {
+            this.checkForEmpty();
+        }, 0);
     }
 
-    // listeners
-    @Listen('document:mousedown', { passive: true })
-    async mousedown(event: MouseEvent) {
+    // lifecycle
+    async componentDidLoad() {
+        this.setupIframe();
+        this.customize();
+    }
+
+    setupIframe() {
+        // Needed for firefox to work
+        this.iframe.contentDocument.open();
+        this.iframe.contentDocument.close();
+
+        // to allow the iframe to make styling and documentexec changes
+        this.iframe.contentDocument.designMode = 'on';
+        this.iframe.contentDocument.body.contentEditable = 'true';
+        this.iframe.contentDocument.body.style.margin = '0';
+
+        this.iframe.contentDocument['oninput'] = () => this.checkForEmpty();
+        this.iframe.contentDocument['onchange'] = () => this.checkForEmpty();
+        this.iframe.contentDocument['onclick'] = () => this.resetPopovers();
+        this.iframe.contentDocument['onselectionchange'] = () => this.checkStyles();
+        this.iframe.contentDocument['onkeyup'] = (event: KeyboardEvent) => this.keyup(event);
+        this.iframe.contentDocument['onkeydown'] = (event: KeyboardEvent) => this.keydown(event);
+        this.iframe.contentDocument['onmousedown'] = (event: MouseEvent) => this.mousedown(event);
+        this.iframe.contentDocument['touchstart'] = (event: MouseEvent) => this.touchstart(event);
+
+        this.iframe.contentDocument.body['onfocus'] = () => {
+            if (!this.toolbarRef.className.includes('show')) {
+                this.toolbarRef.className += ' show';
+            }
+        }
+
+        this.iframe.contentDocument.body['onblur'] = () => {
+            this.toolbarRef.classList.remove('show');
+        }
+    }
+
+    mousedown(event: MouseEvent) {
         this.anchorEvent = event;
     }
 
-    @Listen('document:keydown', { passive: true })
-    async keydown(event: KeyboardEvent) {
+    keydown(event: KeyboardEvent) {
         if (event.keyCode === 91 || event.keyCode === 93) { // keycode control button
             this.keycodeDown = event.keyCode;
         } else if (this.keycodeDown === 91 || this.keycodeDown === 93) {
@@ -83,27 +118,26 @@ export class HiveRichTextComponent {
                     this.toggleActiveState('italic');
                     break;
                 case 85:
-                    this.style('underline', this.selection);
+                    this.style('underline');
                     this.toggleActiveState('underline');
                     break;
             }
         }
     }
 
-    @Listen('document:keyup', { passive: true })
-    async keyup(event: KeyboardEvent) {
-        if (this.div) {
-            const cursor = this.div.querySelector('.hive-cursor') as HTMLSpanElement;
+    keyup(event: KeyboardEvent) {
+        if (this.iframe) {
+            const cursor = this.iframe.contentDocument.querySelector('.hive-cursor') as HTMLSpanElement;
             if (cursor) {
                 const parentNode = cursor.parentNode as HTMLElement;
                 parentNode.innerHTML = cursor.innerHTML.replace(/\uFEFF/g, '');
                 cursor.remove();
 
-                const range = document.createRange();
-                range.setStart(parentNode, 1);
+                const range = this.iframe.contentDocument.createRange();
+                range.setStart(parentNode, 1 || 0);
 
-                this.el.shadowRoot.getSelection().empty();
-                this.el.shadowRoot.getSelection().addRange(range);
+                this.iframe.contentDocument.getSelection().empty();
+                this.iframe.contentDocument.getSelection().addRange(range);
             }
         }
 
@@ -112,19 +146,16 @@ export class HiveRichTextComponent {
         }
     }
 
-    @Listen('document:touchstart', { passive: true })
-    async touchstart(event: MouseEvent) {
+    touchstart(event: MouseEvent) {
         this.anchorEvent = event;
     }
 
-    @Listen('document:selectionchange', { passive: true })
-    async selectionchange() {
-        await this.setSelection();
-    }
-
-    // lifecycle
-    componentDidLoad() {
-        this.customize();
+    checkForEmpty() {
+        if (!this.iframe.contentDocument.body.innerHTML && !this.div.className.includes('empty')) {
+            this.div.className += ' empty';
+        } else {
+            this.div.className = this.div.className.replace(/ empty/g, '');
+        }
     }
 
     determineComponent(component: string) {
@@ -205,7 +236,7 @@ export class HiveRichTextComponent {
                 case 'justifyFull':
                     element =
                         <div class='button-container'>
-                            <div class={component + ' button'} onClick={() => this.onActionClick(component, this.selection, true)}>
+                            <div class={component + ' button'} onClick={() => this.onActionClick(component, true)}>
                                 {Icons[component]}
                             </div>
                         </div>
@@ -214,7 +245,7 @@ export class HiveRichTextComponent {
                 case 'justifyCenter':
                     element =
                         <div class='button-container'>
-                            <div class={component + ' button'} onClick={() => this.onActionClick(component, this.selection, true)}>
+                            <div class={component + ' button'} onClick={() => this.onActionClick(component, true)}>
                                 {Icons[component]}
                             </div>
                         </div>
@@ -223,7 +254,7 @@ export class HiveRichTextComponent {
                 case 'justifyLeft':
                     element =
                         <div class='button-container'>
-                            <div class={component + ' button'} onClick={() => this.onActionClick(component, this.selection, true)}>
+                            <div class={component + ' button'} onClick={() => this.onActionClick(component, true)}>
                                 {Icons[component]}
                             </div>
                         </div>
@@ -232,7 +263,7 @@ export class HiveRichTextComponent {
                 case 'justifyRight':
                     element =
                         <div class='button-container'>
-                            <div class={component + ' button'} onClick={() => this.onActionClick(component, this.selection, true)}>
+                            <div class={component + ' button'} onClick={() => this.onActionClick(component, true)}>
                                 {Icons[component]}
                             </div>
                         </div>
@@ -240,7 +271,7 @@ export class HiveRichTextComponent {
                     break;
                 default:
                     if (allowedConfig.includes(component)) {
-                        element = <div class={component + ' button'} onClick={($event: UIEvent) => this.style(component, this.selection, $event)}>{Icons[component]}</div>
+                        element = <div class={component + ' button'} onClick={($event: UIEvent) => this.style(component, $event)}>{Icons[component]}</div>
                         this.addedToToolbar.push(component);
                     }
                     break;
@@ -250,6 +281,8 @@ export class HiveRichTextComponent {
     }
 
     resetPopovers(exclude: string[] = []) {
+        this.checkForEmpty();
+
         if ((this.linkPopoverOpen || this.linkPopover) && !this.currentStates.includes('link')) {
             this.removeLinkPopover();
         }
@@ -262,49 +295,47 @@ export class HiveRichTextComponent {
     }
 
     // styling
-    style(component: string, selection: Selection, event?: UIEvent, showUI?: boolean, value?: string) {
+    style(component: string, event?: UIEvent, showUI?: boolean, value?: string) {
         return new Promise<void>(async (resolve) => {
-            if (event !== null) {
+            if (!!event) {
                 event.stopPropagation();
             }
 
-            this.resetPopovers();
-
-            if (selection.type === 'Caret') {
+            if (this.iframe.contentDocument.getSelection().type === 'Caret') {
                 if (!this.currentStates.includes(component)) {
-                    const newComponent = document.createElement(this.createComponent(component));
-                    newComponent.innerHTML = `<span class="hive-cursor">${this.emptySpace}</span>`;
-                    selection.getRangeAt(0).insertNode(newComponent);
+                    const componentType = this.createComponent(component);
+                    if (componentType) {
+                        const newComponent = this.iframe.contentDocument.createElement(componentType);
+                        newComponent.innerHTML = `<span class="hive-cursor">${this.emptySpace}</span>`;
+                        this.iframe.contentDocument.getSelection().getRangeAt(0).insertNode(newComponent);
 
-                    const cursor = this.div.querySelector('.hive-cursor') as HTMLSpanElement;
+                        const cursor = this.iframe.contentDocument.querySelector('.hive-cursor');
 
-                    const range = document.createRange();
-                    range.setStart(cursor, 1);
+                        const range = this.iframe.contentDocument.createRange();
+                        range.setStart(cursor, 1);
 
-                    this.el.shadowRoot.getSelection().empty();
-                    this.el.shadowRoot.getSelection().addRange(range);
+                        this.iframe.contentDocument.getSelection().empty();
+                        this.iframe.contentDocument.getSelection().addRange(range);
+                        this.focus();
+                    }
                 } else {
-                    let cursor = this.div.querySelector('.hive-cursor') as HTMLSpanElement;
+                    let cursor = this.iframe.contentDocument.querySelector('.hive-cursor');
                     if (cursor) {
                         const parentNode = cursor.parentNode as HTMLElement;
                         parentNode.remove();
 
-                        this.selectionRange = selection.getRangeAt(0);
-                        this.selection = selection;
-                        this.div.focus();
-
-                        this.checkStyles(selection);
+                        this.checkStyles();
+                        this.focus();
                     } else {
-                        this.selectionRange = selection.getRangeAt(0);
-                        this.selection = selection;
-
-                        document.execCommand(component, showUI, value);
-                        this.div.focus();
+                        this.iframe.contentDocument.execCommand(component, showUI, value);
+                        this.toggleActiveState(component);
+                        this.focus();
                     }
                 }
             } else {
-                await this.applyStyle(selection, component, showUI, value);
-                await this.initStyle(selection);
+                await this.applyStyle(component, showUI, value);
+                await this.initStyle();
+                this.focus();
             }
 
             resolve();
@@ -331,34 +362,34 @@ export class HiveRichTextComponent {
         return value;
     }
 
-    private applyStyle(selection: Selection, style: string, showUI?: boolean, value?: string): Promise<void> {
+    private applyStyle(style: string, showUI?: boolean, value?: string): Promise<void> {
         return new Promise<void>(async (resolve) => {
-            if (!selection || selection.rangeCount <= 0 || !document) {
+            if (!this.iframe.contentDocument.getSelection() || this.iframe.contentDocument.getSelection().rangeCount <= 0 || !document) {
                 resolve();
                 return;
             }
 
-            const text: string = selection.toString();
+            const text: string = this.iframe.contentDocument.getSelection().toString();
 
             if (!text || text.length <= 0) {
                 resolve();
                 return;
             }
 
-            document.execCommand(style, showUI, value);
+            this.iframe.contentDocument.execCommand(style, showUI, value);
 
             resolve();
         });
     }
 
-    private initStyle(selection: Selection): Promise<void> {
+    private initStyle(): Promise<void> {
         return new Promise<void>(async (resolve) => {
-            if (!selection || selection.rangeCount <= 0) {
+            if (!this.iframe.contentDocument.getSelection() || this.iframe.contentDocument.getSelection().rangeCount <= 0) {
                 resolve();
                 return;
             }
 
-            const content: Node = selection.anchorNode;
+            const content: Node = this.iframe.contentDocument.getSelection().anchorNode;
 
             if (!content) {
                 resolve();
@@ -405,7 +436,7 @@ export class HiveRichTextComponent {
     onColorClick(value: boolean, type: string) {
         this.resetPopovers([type]);
 
-        if (this.selection.type === 'Caret') {
+        if (this.iframe.contentDocument.getSelection().type === 'Caret') {
             this.focus();
             return;
         }
@@ -414,7 +445,7 @@ export class HiveRichTextComponent {
             this.colorOpen = value;
         } else if (type === 'highlight') {
             if (this.currentStates.includes('highlight')) {
-                this.style('removeFormat', this.selection);
+                this.style('removeFormat');
             } else {
                 this.highlightOpen = value;
             }
@@ -427,55 +458,46 @@ export class HiveRichTextComponent {
         this.focus();
 
         if (type === 'color') {
-            this.style('foreColor', this.selection, null, true, data);
+            this.style('foreColor', null, true, data);
         } else if (type === 'highlight') {
-            this.style('hiliteColor', this.selection, null, true, data);
+            this.style('hiliteColor', null, true, data);
         } else if (type === 'link') {
-            this.style('createLink', this.selection, null, true, data);
+            this.style('createLink', null, true, data);
         }
     }
 
     focus() {
-        if (this.selectionRange) {
-            this.el.shadowRoot.getSelection().empty();
-            this.el.shadowRoot.getSelection().addRange(this.selectionRange);
-        }
-
-        this.div.focus();
+        this.iframe.contentDocument.body.focus();
+        this.checkForEmpty();
     }
 
     // links
     async onLinkClick(value: boolean) {
         if (this.currentStates.includes('link')) {
             // if link is active then unlink
-            this.style('unlink', this.selection);
+            this.style('unlink');
         } else if (value) {
             if (this.linkPopover) {
                 this.removeLinkPopover();
                 this.focus();
             }
 
-            if (!this.selection) {
-                this.selection = this.el.shadowRoot.getSelection();
-            }
-
-
-            if (this.selection && this.selection.type === 'Caret') {
-                const anchor = document.createElement('a');
+            if (this.iframe.contentDocument.getSelection().type === 'Caret') {
+                const anchor = this.iframe.contentDocument.createElement('a');
                 anchor.href = window.location.href;
 
-                this.selection.getRangeAt(0).insertNode(anchor);
+                this.iframe.contentDocument.getSelection().getRangeAt(0).insertNode(anchor);
 
                 this.createLinkPopover(anchor, true);
             } else {
                 this.creatingLink = true;
-                await this.style('createLink', this.selection, null, true, window.location.href);
+                await this.style('createLink', null, true, window.location.href);
             }
         }
     }
 
     createLinkPopover(node: Node, creating: boolean) {
-        this.linkPopover = document.createElement('hive-link-popover') as HTMLHiveLinkPopoverElement;
+        this.linkPopover = this.iframe.contentDocument.createElement('hive-link-popover') as HTMLHiveLinkPopoverElement;
 
         if (!(node as HTMLAnchorElement).href) {
             this.createLinkPopover(node.parentElement, creating);
@@ -484,8 +506,8 @@ export class HiveRichTextComponent {
                 this.linkActionHandler(event.detail, node as HTMLAnchorElement);
             });
 
-            let top = (node as HTMLAnchorElement).offsetTop + 30;
-            let left = (node as HTMLAnchorElement).offsetLeft;
+            let top = (node as HTMLAnchorElement).offsetTop + 80;
+            let left = (node as HTMLAnchorElement).offsetLeft + 5;
 
             this.linkPopover.style.top = (top) + 'px';
             this.linkPopover.style.left = (left) + 'px';
@@ -516,9 +538,9 @@ export class HiveRichTextComponent {
         if (!text) {
             node.remove();
         } else if (!url) {
+            this.div.className = this.div.className.replace(' empty', '');
             node.replaceWith(node.text);
-            this.checkStyles(this.selection);
-            this.selectionRange = null;
+            this.checkStyles();
             this.focus();
         } else {
             switch (action) {
@@ -532,13 +554,10 @@ export class HiveRichTextComponent {
 
                     node.innerText = text;
                     node.href = url;
-                    this.selectionRange = null;
                     this.focus();
                     break;
                 case 'unlink':
                     node.replaceWith(node.text);
-                    this.checkStyles(this.selection);
-                    this.selectionRange = null;
                     this.focus();
                     break;
                 case 'open':
@@ -549,24 +568,24 @@ export class HiveRichTextComponent {
     }
 
     // other actions
-    onActionClick(component: string, selection?: Selection, alignment?: boolean) {
+    onActionClick(component: string, alignment?: boolean) {
 
-        if (alignment && selection) {
-            const node = selection.anchorNode.parentNode as HTMLElement;
+        if (alignment && this.iframe.contentDocument.getSelection()) {
+            const node = this.iframe.contentDocument.getSelection().anchorNode.parentNode as HTMLElement;
             node.style.removeProperty('text-align');
 
-            document.execCommand(component);
+            this.iframe.contentDocument.execCommand(component);
         } else {
-            document.execCommand(component);
+            this.iframe.contentDocument.execCommand(component);
         }
 
-        this.checkStyles(selection);
+        this.checkStyles();
     }
 
     // styling
-    async checkStyles(selection: Selection) {
-        if (selection && selection.anchorNode && selection.anchorNode.parentNode) {
-            const node = selection.anchorNode.parentNode as HTMLElement;
+    async checkStyles() {
+        if (this.iframe.contentDocument.getSelection() && this.iframe.contentDocument.getSelection().anchorNode && this.iframe.contentDocument.getSelection().anchorNode.parentNode) {
+            const node = this.iframe.contentDocument.getSelection().anchorNode.parentNode as HTMLElement;
 
             const states = [];
 
@@ -647,7 +666,7 @@ export class HiveRichTextComponent {
             if (this.addedToToolbar.includes('highlight')) {
                 (await EditorUtils.isStyle(node, [], ['background-color'])) ? states.push('highlight') : null;
 
-                const highlightButton = this.el.shadowRoot.getElementById('highlight');
+                const highlightButton = this.el.shadowRoot.querySelector('#highlight') as HTMLElement;
                 if (node.style.backgroundColor && highlightButton) {
                     highlightButton.style.fill = node.style.backgroundColor;
                 } else {
@@ -656,7 +675,7 @@ export class HiveRichTextComponent {
             }
 
             if (this.addedToToolbar.includes('color')) {
-                const colorButton = this.el.shadowRoot.getElementById('color');
+                const colorButton = this.el.shadowRoot.querySelector('#color') as HTMLElement;
                 (await EditorUtils.isStyle(node, [], ['color'])) ? states.push('color') : null;
 
                 if ((node as HTMLFontElement).color && colorButton) {
@@ -700,35 +719,6 @@ export class HiveRichTextComponent {
         }
     }
 
-    // helpers
-    setSelection(): Promise<void> {
-        return new Promise<void>(async (resolve) => {
-            const selection: Selection = await this.el.shadowRoot.getSelection();
-            await this.checkStyles(selection);
-
-            if (!this.anchorEvent) {
-                resolve();
-                return;
-            }
-
-            this.selection = selection;
-
-            // if just clicked without highlighting anything
-            if (!selection || selection.toString().length <= 0) {
-                resolve();
-                return;
-            }
-
-            if (this.selection && this.selection.rangeCount > 0) {
-                this.selectionRange = this.selection.getRangeAt(0);
-            } else {
-                this.selection = null;
-            }
-
-            resolve();
-        });
-    }
-
     private getContainer(topLevel: Node): Promise<HTMLElement> {
         return new Promise<HTMLElement>(async (resolve) => {
             if (!topLevel) {
@@ -744,11 +734,11 @@ export class HiveRichTextComponent {
 
     // visuals
     customize() {
-        this.toolbarRef = this.el.shadowRoot.getElementById('toolbar');
-
-        if (this.options) {
+        if (this.options && this.toolbarRef) {
             if (this.options.content) {
-                this.div.innerHTML = this.options.content;
+                this.iframe.contentDocument.body.innerHTML = this.options.content;
+            } else {
+                this.div.className += ' empty';
             }
 
             if (this.options.height) {
@@ -774,19 +764,19 @@ export class HiveRichTextComponent {
                     this.toolbarRef.className += ' selection';
                 }
 
-                this.el.onfocus = () => {
-                    if (!this.toolbarRef.className.includes('show')) {
-                        this.toolbarRef.className += ' show';
-                    }
-                }
+                // this.el.onfocus = () => {
+                //     if (!this.toolbarRef.className.includes('show')) {
+                //         this.toolbarRef.className += ' show';
+                //     }
+                // }
 
-                this.el.onblur = () => {
-                    this.toolbarRef.classList.remove('show');
-                }
+                // this.el.onblur = () => {
+                //     this.toolbarRef.classList.remove('show');
+                // }
             }
 
             if (this.options.autoFocus) {
-                this.div.focus();
+                this.focus();
             }
 
             if (this.options.placeholder) {
@@ -806,7 +796,7 @@ export class HiveRichTextComponent {
     // takes the inputed height and adds the toolbar height in order to get the correct height of the host
     @Method()
     resize() {
-        this.div.parentElement.style.height = 'calc(' + this.height + ' - ' + this.toolbarRef.clientHeight + 'px)';
+        this.iframe.parentElement.style.height = 'calc(' + this.height + ' - ' + this.toolbarRef.clientHeight + 'px)';
         this.el.style.height = this.height;
         this.el.style.width = this.width;
     }
@@ -832,10 +822,10 @@ export class HiveRichTextComponent {
             <div class="container">
                 {this.options && this.options.position === 'bottom' ?
                     <div class='container'>
-                        <div class='text-container'>
-                            <div id='text-content' ref={(el: HTMLDivElement) => this.div = el} contentEditable='true' onClick={() => this.resetPopovers()}></div>
+                        <div class='text-container' ref={(el: HTMLDivElement) => this.div = el}>
+                            <iframe id='text-container' ref={(el: HTMLIFrameElement) => this.iframe = el}></iframe>
                         </div>
-                        <div id='toolbar' class='toolbar bottom'>
+                        <div id='toolbar' class='toolbar bottom' ref={(el: HTMLDivElement) => this.toolbarRef = el}>
                             {this.toolbar.map((bar) =>
                                 this.determineComponent(bar)
                             )}
@@ -843,13 +833,13 @@ export class HiveRichTextComponent {
                     </div>
                     :
                     <div class='container'>
-                        <div id='toolbar' class='toolbar top'>
+                        <div id='toolbar' class='toolbar top' ref={(el: HTMLDivElement) => this.toolbarRef = el}>
                             {this.toolbar.map((bar) =>
                                 this.determineComponent(bar)
                             )}
                         </div>
-                        <div class='text-container'>
-                            <div id='text-content' ref={(el: HTMLDivElement) => this.div = el} contentEditable='true' onClick={() => this.resetPopovers()}></div>
+                        <div class='text-container' ref={(el: HTMLDivElement) => this.div = el}>
+                            <iframe id='text-container' ref={(el: HTMLIFrameElement) => this.iframe = el}></iframe>
                         </div>
                     </div>
                 }

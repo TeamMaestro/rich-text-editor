@@ -16,7 +16,7 @@ export class ColorPopoverComponent {
   @Watch('isOpen')
   openHandler(newValue: boolean) {
     if (newValue) {
-      const input = this.el.shadowRoot.getElementById('color-input');
+      const input = this.el.shadowRoot.querySelector('#color-input') as HTMLInputElement;
       input.focus();
     }
   }
@@ -42,8 +42,8 @@ export class ColorPopoverComponent {
   }
 
   updateSelectorColor() {
-    const input = this.el.shadowRoot.getElementById('color-input') as HTMLInputElement;
-    const hexColorSelector = this.el.shadowRoot.getElementById('hex-color-selector');
+    const input = this.el.shadowRoot.querySelector('#color-input') as HTMLInputElement;
+    const hexColorSelector = this.el.shadowRoot.querySelector('#hex-color-selector') as HTMLElement;
 
     if (!input.value.startsWith('#')) {
       input.value = '#' + input.value;
@@ -62,7 +62,7 @@ export class ColorPopoverComponent {
   }
 
   reset() {
-    const input = this.el.shadowRoot.getElementById('color-input') as HTMLInputElement;
+    const input = this.el.shadowRoot.querySelector('#color-input') as HTMLInputElement;
     input.value = '';
 
     this.updateSelectorColor();
