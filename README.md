@@ -40,6 +40,7 @@ Where `options` can be populated with any of the following properties.
 |`showToolbar`|`always`|How the toolbar should be shown or hidden based on user actions |`always`, `onHover`, or `onSelect`|
 |`dynamicSizing`|`true`|To constantly check if the component needs to dynamically be resized.|`boolean`|
 |`autoFocus`|`false`|To focus on the text component upon init.|`boolean`|
+|`font: {`</br>`family,`</br>`size,`</br>`color,`</br>`};`| `family: Arial`</br>`size: 12px`</br>`color: #626272` | To set what the font variables will be in the rich text container. | `family: string`</br>`size: string`</br>`color: string`
 
 
 ### Methods

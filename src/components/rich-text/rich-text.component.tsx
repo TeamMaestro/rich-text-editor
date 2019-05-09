@@ -34,12 +34,16 @@ export class HiveRichTextComponent {
     toolbar = ['bold', 'italic', 'underline', 'strikethrough', '|', 'link', '|', 'color', 'highlight']; // what components to render in the corresponding order
     height = '100%';
     width = '100%';
+    font = {
+        family: 'Arial',
+        size: '14px',
+        color: '#626272'
+    }
 
     // customize
     @Prop() options: Partial<RichTextEditorOptions> = {
         dynamicSizing: true,
-        placeholder: 'Insert text...',
-        showToolbar: 'onSelect'
+        placeholder: 'Insert text...'
     };
 
     // states
@@ -786,6 +790,31 @@ export class HiveRichTextComponent {
                 window.onresize = () => {
                     this.resize();
                 }
+            }
+
+
+            if (this.options.font && this.options.font.family) {
+                this.iframe.contentDocument.body.style.fontFamily = this.options.font.family;
+                this.el.style.setProperty('--font-family', this.options.font.family);
+            } else {
+                this.iframe.contentDocument.body.style.fontFamily = this.font.family;
+                this.el.style.setProperty('--font-family', this.font.family);
+            }
+
+            if (this.options.font && this.options.font.size) {
+                this.iframe.contentDocument.body.style.fontSize = this.options.font.size;
+                this.el.style.setProperty('--font-size', this.options.font.size);
+            } else {
+                this.iframe.contentDocument.body.style.color = this.font.color;
+                this.el.style.setProperty('--font-size', this.font.size);
+            }
+
+            if (this.options.font && this.options.font.color) {
+                this.iframe.contentDocument.body.style.color = this.options.font.color;
+                this.el.style.setProperty('--font-color', this.options.font.color);
+            } else {
+                this.iframe.contentDocument.body.style.fontSize = this.font.size;
+                this.el.style.setProperty('--font-color', this.font.color);
             }
         }
 

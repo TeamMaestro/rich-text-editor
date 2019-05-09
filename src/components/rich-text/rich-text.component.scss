@@ -1,6 +1,8 @@
 :host {
     --size: 25px;
-
+    --font-family: 'Arial';
+    --font-size: '14px';
+    --font-color: '#626272';
     display: inline-block;
     height: auto;
     width: auto;
@@ -9,6 +11,8 @@
     background: var(--background);
     border-radius: var(--border-radius);
     font-family: var(--font-family);
+    font-size: var(--font-size);
+    color: var(--font-color);
 
     .container {
         height: 100%;
@@ -139,6 +143,7 @@
                 box-shadow: none;
 
                 background: transparent;
+                font-family: var(--font-family);
 
                 ol,
                 ul,

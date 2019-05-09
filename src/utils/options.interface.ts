@@ -21,4 +21,10 @@ export interface RichTextEditorOptions {
     
         dynamicSizing: boolean; // checks when the window resizes to resize the editor 
     autoFocus: boolean;
+
+    font?: {
+        family?: string;
+        size?: string;
+        color?: string;
+    }
 }
