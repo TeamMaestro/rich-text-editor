@@ -44,16 +44,25 @@ export class LinkPopoverComponent {
 	}
 
 	componentDidUnload() {
-		if (!this.submit && (!this.text || !this.linkInput.value)) {
-			this.actionHandler('destroy', null, this.text);
-		}
+		this.checkDestroy();
 	}
 
 	componentDidLoad() {
 		this.linkInput = this.el.shadowRoot.querySelector('#link-input') as HTMLInputElement;
+		if (!this.linkInput.value) {
+			this.linkInput.focus();
+		}
 
 		if (!this.text) {
 			this.textInput = this.el.shadowRoot.querySelector('#text-input') as HTMLInputElement;
+		}
+
+		this.el['onblur'] = () => this.checkDestroy();
+	}
+
+	checkDestroy() {
+		if (!this.submit && (!this.text || !this.linkInput.value)) {
+			this.actionHandler('destroy', null, this.text);
 		}
 	}
 
@@ -62,7 +71,7 @@ export class LinkPopoverComponent {
 			<div>
 				<div class='arrow'></div>
 				<div class='info-container'>
-					<input id="link-input" placeholder="https://" autoFocus value={(this.creating) ? null : this.url} onKeyUp={($event: KeyboardEvent) => this.handleKeyUp($event)}></input>
+					<input id="link-input" placeholder="https://" value={(this.creating) ? null : this.url} onKeyUp={($event: KeyboardEvent) => this.handleKeyUp($event)}></input>
 					{(!this.text) ?
 						<input id="text-input" placeholder="Text to display" value={this.text} onKeyUp={($event: KeyboardEvent) => this.handleKeyUp($event)}></input>
 						: null

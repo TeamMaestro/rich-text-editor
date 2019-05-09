@@ -20,6 +20,8 @@ export class HiveRichTextComponent {
     @State() linkPopoverOpen = false;
 
     linkPopover: HTMLHiveLinkPopoverElement;
+    linkPopoverTopOffset: number = 40;
+
     linkNode: Node;
     creatingLink: boolean;
     toolbarRef: HTMLElement;
@@ -36,7 +38,8 @@ export class HiveRichTextComponent {
     // customize
     @Prop() options: Partial<RichTextEditorOptions> = {
         dynamicSizing: true,
-        placeholder: 'Insert text...'
+        placeholder: 'Insert text...',
+        showToolbar: 'onSelect'
     };
 
     // states
@@ -91,14 +94,20 @@ export class HiveRichTextComponent {
         this.iframe.contentDocument['onmousedown'] = (event: MouseEvent) => this.mousedown(event);
         this.iframe.contentDocument['touchstart'] = (event: MouseEvent) => this.touchstart(event);
 
-        this.iframe.contentDocument.body['onfocus'] = () => {
-            if (!this.toolbarRef.className.includes('show')) {
-                this.toolbarRef.className += ' show';
+        if (this.options.showToolbar === 'onSelect') {
+            this.iframe.contentDocument.body['onfocus'] = () => {
+                if (!this.toolbarRef.className.includes('show')) {
+                    this.toolbarRef.className += ' show';
+                }
             }
-        }
 
-        this.iframe.contentDocument.body['onblur'] = () => {
-            this.toolbarRef.classList.remove('show');
+            this.iframe.contentDocument.body['onblur'] = () => {
+                setTimeout(() => { // set timeout to make sure that there isn't any popovers or focus still happening
+                    if (!this.colorOpen && !this.highlightOpen && !this.linkPopoverOpen && !this.iframe.contentDocument.hasFocus()) {
+                        this.toolbarRef.classList.remove('show');
+                    }
+                }, 500);
+            }
         }
     }
 
@@ -506,7 +515,7 @@ export class HiveRichTextComponent {
                 this.linkActionHandler(event.detail, node as HTMLAnchorElement);
             });
 
-            let top = (node as HTMLAnchorElement).offsetTop + 80;
+            let top = (node as HTMLAnchorElement).offsetTop + this.linkPopoverTopOffset;
             let left = (node as HTMLAnchorElement).offsetLeft + 5;
 
             this.linkPopover.style.top = (top) + 'px';
@@ -763,16 +772,6 @@ export class HiveRichTextComponent {
                 if (!this.toolbarRef.className.includes('selection')) {
                     this.toolbarRef.className += ' selection';
                 }
-
-                // this.el.onfocus = () => {
-                //     if (!this.toolbarRef.className.includes('show')) {
-                //         this.toolbarRef.className += ' show';
-                //     }
-                // }
-
-                // this.el.onblur = () => {
-                //     this.toolbarRef.classList.remove('show');
-                // }
             }
 
             if (this.options.autoFocus) {
@@ -799,6 +798,10 @@ export class HiveRichTextComponent {
         this.iframe.parentElement.style.height = 'calc(' + this.height + ' - ' + this.toolbarRef.clientHeight + 'px)';
         this.el.style.height = this.height;
         this.el.style.width = this.width;
+
+        if (this.options.position !== 'bottom') {
+            this.linkPopoverTopOffset = this.linkPopoverTopOffset + this.toolbarRef.clientHeight;
+        }
     }
 
     render() {
