@@ -120,7 +120,9 @@
         }
 
         .text-container {
-            div {
+            position: relative;
+
+            iframe {
                 display: inline-block;
                 color: var(--color);
 
@@ -140,18 +142,20 @@
 
                 ol,
                 ul,
-                div {
+                iframe {
                     margin: 0;
                     padding: 0;
                 }
 
-                &:empty {
-                    &:not(:focus) {
-                        &:before {
-                            content: attr(placeholder);
-                            color: #ccc;
-                        }
-                    }
+            }
+
+            &.empty {
+                &:before {
+                    content: attr(placeholder);
+                    color: #ccc;
+                    position: absolute;
+                    top: 10px;
+                    left: 10px;
                 }
             }
         }
@@ -169,5 +173,5 @@
     [contenteditable] {
         -webkit-user-select: auto;
         user-select: all;
-      }
+    }
 }
