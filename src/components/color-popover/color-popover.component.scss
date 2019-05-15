@@ -38,10 +38,10 @@
         z-index: 10;
         background: #fff;
         box-shadow: 0 0 2px 2px rgba(0, 0, 0, .15);
-        border-radius: var(--border-radius);
+        border-radius: var(--hive-rte-border-radius);
 
         &.bottom {
-            top: calc(var(--size) * -2.5);
+            top: calc(var(--hive-rte-button-size) * -2.5);
         }
 
         .color-picker-container {
@@ -55,7 +55,7 @@
                 width: 65px;
                 font-size: 10px;
                 padding: 5px;
-                border-radius: var(--border-radius);
+                border-radius: var(--hive-rte-border-radius);
                 border: 1px solid #d1d1d1;
                 outline: none;
 

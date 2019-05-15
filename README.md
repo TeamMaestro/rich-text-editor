@@ -3,15 +3,21 @@
 # Hive Rich Text Editor
 This web component allows you to add rich text editing to your applications.
 
-## Features
+&nbsp;
+
+# Features
 - Add styling to your text inputs
 - Fully customizable toolbar
-- Allows for dynamic and static sizing
+- Flexbox based
 
-## Installation
+&nbsp;
+
+# Installation
 - `npm i @teamhive/rich-text-editor`
 
-## Usage
+&nbsp;
+
+# Usage
 Somewhere in your project (e.g. `main.ts`):
 ```
 import { defineCustomElements } from '@teamhive/rich-text-editor/dist/loader';
@@ -22,9 +28,11 @@ defineCustomElements(window);
 <hive-rich-text [options]="options"></hive-rich-text>
 ```
 
-Where `options` can be populated with any of the following properties.
+Where `options` can be populated with any of the following properties:
 
-### Properties
+&nbsp;
+
+## Properties
 |Property|Default|Description|Values|
 :---|:---|:---|:---
 |`toolbar`|`['bold', 'italic', 'underline', 'strikethrough', '\|', 'link', '\|', 'color', 'highlight']`|The components that will show up in the toolbar.|`bold, italic, underline, strikethrough, link, color, highlight, undo, redo, superscript, subscript, orderedList, unorderedList, -, \|`|
@@ -32,27 +40,41 @@ Where `options` can be populated with any of the following properties.
 |`highlights`|`['#f3f315', '#ff0099', '#83f52c', '#ff6600', '#6e0dd0']`|The colors that will show up for a quick selection when formating highlight color.|Any valid hex code|
 |`position`|`top`|The position of the toolbar in relation to the text container.|`top` or `bottom`|
 |`content`|`null`|The content that will be loaded into the text container upon loading.|`plain text` and/or `html text` as a `string`|
-|`height`|`100%`|The total height of the entire component. The text container will be equal to this subtracted by the toolbar height.|Any valid css|
 |`placeholder`|`Insert text...`|The text that will display when the rich editor is unfocused in the empty state.|`string`|
-|`width`|`100%`|The total width of the entire component.|Any valid css|
-|`border`|`1px solid #d1d1d1`|The border style that will show up.|Any valid css|
-|`borderRadius`|`2px`|The border radius that will be applied to entire component.|Any valid css.|
 |`showToolbar`|`always`|How the toolbar should be shown or hidden based on user actions |`always`, `onHover`, or `onSelect`|
-|`dynamicSizing`|`true`|To constantly check if the component needs to dynamically be resized.|`boolean`|
 |`autoFocus`|`false`|To focus on the text component upon init.|`boolean`|
 |`font: {`</br>`family,`</br>`size,`</br>`color,`</br>`};`| `family: Arial`</br>`size: 12px`</br>`color: #626272` | To set what the font variables will be in the rich text container. | `family: string`</br>`size: string`</br>`color: string`
 
+&nbsp;
 
-### Methods
+## Custom Styling
+|Property|Default
+:---|:---
+|`--hive-rte-background`|`none`|
+|`--hive-rte-button-size`|`25px`|
+|`--hive-rte-border`|`1px solid #d1d1d1`|
+|`--hive-rte-border-radius`|`0`|
+|`--hive-rte-font-family`|`Arial`|
+|`--hive-rte-font-size`|`14px`|
+|`--hive-rte-font-color`|`#626272`|
+|`--hive-rte-max-height`|`none`|
+|`--hive-rte-height`|`100%`|
+|`--hive-rte-min-height`|`0`|
+|`--hive-rte-max-width`|`none`|
+|`--hive-rte-width`|`100%`|
+|`--hive-rte-min-width`|`0`|
+
+&nbsp;
+
+## Methods
 |Event|Description|Values|Return|
 :---|:---|:---|:---
 |`getContent()`|To return the current contents of the editor.|`null`|`return: { text: 'Hive Rich Text Editor', html: '<b>Hive Rich Text Editor</b> }'`
 |`setContent(value: string)`|To set the content within the editor at any given time. Will override any and all values within the text editor.|`plain text` and/or `html text` as a `string`|`null`
-|`resize()`|To resize the entire rich text editor. May be needed when used within modals or other entry components.| none | `null`
 
----
+&nbsp;
 
-## Contributors
+# Contributors
 
 [<img alt="Austin Miller" src="https://avatars2.githubusercontent.com/u/24658060?s=460&v=4" width="117">](https://github.com/mr-austinmiller) |
 :---:

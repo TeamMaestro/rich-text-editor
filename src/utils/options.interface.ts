@@ -6,13 +6,7 @@ export interface RichTextEditorOptions {
     position: 'top' | 'bottom'; // position of the bar. ('top' || 'bottom')
     content: string; // content to be initialized inside the editor
 
-    height: string; // height of the editor text container
-    width: string; // width of the editor text container
-
     placeholder: string; // what to display when the text box is empty
-
-    border: string; // styling of the border for the host component
-    borderRadius: string; // styling of the border for the host component
 
     showToolbar:
     'always' | // always show the toolbar. Default behavior

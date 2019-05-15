@@ -1,13 +1,19 @@
 :host {
     --hive-rte-background: none;
     --hive-rte-button-size: 25px;
-    --hive-rte-border-radius: 0;
     --hive-rte-border: 1px solid #d1d1d1;
+    --hive-rte-border-radius: 0;
     --hive-rte-font-family: 'Arial';
     --hive-rte-font-size: '14px';
-    --hive-rte-font-color: '#626272';
+    --hive-rte-font-color: #626272;
+
+    --hive-rte-max-height: none;
     --hive-rte-height: 100%;
+    --hive-rte-min-height: 0;
+
+    --hive-rte-max-width: none;
     --hive-rte-width: 100%;
+    --hive-rte-min-width: 0;
 
     background: var(--hive-rte-background);
     border-radius: var(--hive-rte-border-radius);
@@ -15,8 +21,14 @@
     font-size: var(--hive-rte-font-size);
     color: var(--hive-rte-font-color);
     border: var(--hive-rte-border);
+
+    max-height: var(--hive-rte-max-height);
     height: var(--hive-rte-height);
+    min-height: var(--hive-rte-min-height);
+
+    max-width: var(--hive-rte-max-width);
     width: var(--hive-rte-width);
+    min-width: var(--hive-rte-min-width);
 
     display: flex;
     flex-direction: column;

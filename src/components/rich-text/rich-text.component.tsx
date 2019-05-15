@@ -40,8 +40,7 @@ export class HiveRichTextComponent {
 
     // customize
     @Prop() options: Partial<RichTextEditorOptions> = {
-        placeholder: 'Insert text...',
-        position: 'bottom'
+        placeholder: 'Insert text...'
     };
 
     // states
@@ -783,8 +782,6 @@ export class HiveRichTextComponent {
 
         if (this.options) {
             style['--hive-rte-position'] = this.options.position || 'top';
-            style['--hive-rte-border'] = this.options.border || '1px solid #d1d1d1';
-            style['--hive-rte-border-radius'] = this.options.borderRadius || '0';
             style['--hive-rte-font-family'] = (this.options.font) ? this.options.font.family : this.font.family;
             style['--hive-rte-font-size'] = (this.options.font) ? this.options.font.size : this.font.size;
             style['--hive-rte-font-color'] = (this.options.font) ? this.options.font.color : this.font.color;
