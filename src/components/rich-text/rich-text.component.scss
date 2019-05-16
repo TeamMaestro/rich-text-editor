@@ -7,6 +7,11 @@
     --hive-rte-font-size: '14px';
     --hive-rte-font-color: #626272;
 
+    --hive-rte-placeholder-position-top: 10px;
+    --hive-rte-placeholder-position-left: 10px;
+    --hive-rte-placeholder-position-right: none;
+    --hive-rte-placeholder-position-bottom: none;
+
     --hive-rte-max-height: none;
     --hive-rte-height: 100%;
     --hive-rte-min-height: 0;
@@ -168,8 +173,10 @@
                 content: attr(placeholder);
                 color: #ccc;
                 position: absolute;
-                top: 10px;
-                left: 10px;
+                top: var(--hive-rte-placeholder-position-top);
+                left: var(--hive-rte-placeholder-position-left);
+                right: var(--hive-rte-placeholder-position-right);
+                bottom: var(--hive-rte-placeholder-position-bottom);
             }
         }
     }

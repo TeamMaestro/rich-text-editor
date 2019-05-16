@@ -495,6 +495,7 @@ export class HiveRichTextComponent {
             if (this.iframe.contentDocument.getSelection().type === 'Caret') {
                 const anchor = this.iframe.contentDocument.createElement('a');
                 anchor.href = window.location.href;
+                anchor.target = '_blank';
 
                 this.iframe.contentDocument.getSelection().getRangeAt(0).insertNode(anchor);
 
@@ -564,6 +565,7 @@ export class HiveRichTextComponent {
 
                     node.innerText = text;
                     node.href = url;
+                    node.target = '_blank';
                     this.focus();
                     break;
                 case 'unlink':
