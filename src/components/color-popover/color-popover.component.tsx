@@ -69,31 +69,29 @@ export class ColorPopoverComponent {
   }
 
   render() {
-    return (
-      <div>
-        <div class={this.position + ' arrow'}></div>
-        <div class={this.position + ' input-container'}>
-          <div class='color-selector-container'>
-            {this.colors.map((color) => {
-              const style = {
-                backgroundColor: color
-              };
-              return <div class='color-selector' style={style} onClick={() => this.onAction(color)}></div>
-            })}
-          </div>
-          <div class='color-picker-container'>
-            <div id='hex-color-selector' class='color-selector empty' style={{
-              backgroundColor: '#fff'
-            }}></div>
-            <input type='text'
-              id='color-input'
-              placeholder='#HEX'
-              onInput={() => this.updateSelectorColor()}
-              onKeyUp={($event: KeyboardEvent) => this.onAction(null, $event)}>
-            </input>
-          </div>
+    return [
+      <div class={this.position + ' arrow'}></div>,
+      <div class={this.position + ' input-container'}>
+        <div class='color-selector-container'>
+          {this.colors.map((color) => {
+            const style = {
+              backgroundColor: color
+            };
+            return <div class='color-selector' style={style} onClick={() => this.onAction(color)}></div>
+          })}
         </div>
-      </div >
-    );
+        <div class='color-picker-container'>
+          <div id='hex-color-selector' class='color-selector empty' style={{
+            backgroundColor: '#fff'
+          }}></div>
+          <input type='text'
+            id='color-input'
+            placeholder='#HEX'
+            onInput={() => this.updateSelectorColor()}
+            onKeyUp={($event: KeyboardEvent) => this.onAction(null, $event)}>
+          </input>
+        </div>
+      </div>
+    ];
   }
 }

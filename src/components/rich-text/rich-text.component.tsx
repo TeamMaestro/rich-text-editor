@@ -32,8 +32,6 @@ export class HiveRichTextComponent {
     colors = ['#FF4541', '#E65100', '#43A047', '#1C9BE6', '#6446EB', '#ACACC2', '#626272']; // default colors for text color selection
     highlights = ['#f3f315', '#ff0099', '#83f52c', '#ff6600', '#6e0dd0']; // default colors for highlighting selection
     toolbar = ['bold', 'italic', 'underline', 'strikethrough', '|', 'link', '|', 'color', 'highlight']; // what components to render in the corresponding order
-    height = '100%';
-    width = '100%';
     font = {
         family: 'Arial',
         size: '14px',
@@ -42,7 +40,6 @@ export class HiveRichTextComponent {
 
     // customize
     @Prop() options: Partial<RichTextEditorOptions> = {
-        dynamicSizing: true,
         placeholder: 'Insert text...'
     };
 
@@ -74,7 +71,7 @@ export class HiveRichTextComponent {
     }
 
     // lifecycle
-    async componentDidLoad() {
+    componentDidLoad() {
         this.setupIframe();
         this.customize();
     }
@@ -754,22 +751,6 @@ export class HiveRichTextComponent {
                 this.div.className += ' empty';
             }
 
-            if (this.options.height) {
-                this.height = this.options.height;
-            }
-
-            if (this.options.width) {
-                this.width = this.options.width;
-            }
-
-            if (this.options.border) {
-                this.el.style.border = this.options.border;
-            }
-
-            if (this.options.borderRadius) {
-                this.el.style.borderRadius = this.options.borderRadius;
-            }
-
             if (this.options.showToolbar === 'onHover') {
                 this.toolbarRef.className += ' phantom';
             } else if (this.options.showToolbar === 'onSelect') {
@@ -786,50 +767,32 @@ export class HiveRichTextComponent {
                 this.div.setAttribute('placeholder', this.options.placeholder);
             }
 
-            if (this.options.dynamicSizing) {
-                window.onresize = () => {
-                    this.resize();
-                }
-            }
-
-
-            if (this.options.font && this.options.font.family) {
-                this.iframe.contentDocument.body.style.fontFamily = this.options.font.family;
-                this.el.style.setProperty('--font-family', this.options.font.family);
-            } else {
-                this.iframe.contentDocument.body.style.fontFamily = this.font.family;
-                this.el.style.setProperty('--font-family', this.font.family);
-            }
-
-            if (this.options.font && this.options.font.size) {
-                this.iframe.contentDocument.body.style.fontSize = this.options.font.size;
-                this.el.style.setProperty('--font-size', this.options.font.size);
-            } else {
-                this.iframe.contentDocument.body.style.color = this.font.color;
-                this.el.style.setProperty('--font-size', this.font.size);
-            }
-
-            if (this.options.font && this.options.font.color) {
-                this.iframe.contentDocument.body.style.color = this.options.font.color;
-                this.el.style.setProperty('--font-color', this.options.font.color);
-            } else {
-                this.iframe.contentDocument.body.style.fontSize = this.font.size;
-                this.el.style.setProperty('--font-color', this.font.color);
-            }
+            this.iframe.contentDocument.body.style.fontSize = (this.options.font) ? this.options.font.size : this.font.size;
+            this.iframe.contentDocument.body.style.color = (this.options.font) ? this.options.font.color : this.font.color;
+            this.iframe.contentDocument.body.style.fontFamily = (this.options.font) ? this.options.font.family : this.font.family;
         }
-
-        this.resize();
-    }
-
-    // takes the inputed height and adds the toolbar height in order to get the correct height of the host
-    @Method()
-    resize() {
-        this.iframe.parentElement.style.height = 'calc(' + this.height + ' - ' + this.toolbarRef.clientHeight + 'px)';
-        this.el.style.height = this.height;
-        this.el.style.width = this.width;
 
         if (this.options.position !== 'bottom') {
             this.linkPopoverTopOffset = this.linkPopoverTopOffset + this.toolbarRef.clientHeight;
+        }
+    }
+
+    hostData() {
+        const style = {};
+
+        if (this.options) {
+            style['--hive-rte-position'] = this.options.position || 'top';
+            style['--hive-rte-font-family'] = (this.options.font) ? this.options.font.family : this.font.family;
+            style['--hive-rte-font-size'] = (this.options.font) ? this.options.font.size : this.font.size;
+            style['--hive-rte-font-color'] = (this.options.font) ? this.options.font.color : this.font.color;
+        }
+
+        return {
+            style,
+            class: {
+                'position-top': (this.options) ? this.options.position !== 'bottom' : true,
+                'position-bottom': (this.options) ? this.options.position === 'bottom' : false
+            }
         }
     }
 
@@ -850,32 +813,15 @@ export class HiveRichTextComponent {
             }
         }
 
-        return (
-            <div class="container">
-                {this.options && this.options.position === 'bottom' ?
-                    <div class='container'>
-                        <div class='text-container' ref={(el: HTMLDivElement) => this.div = el}>
-                            <iframe id='text-container' ref={(el: HTMLIFrameElement) => this.iframe = el}></iframe>
-                        </div>
-                        <div id='toolbar' class='toolbar bottom' ref={(el: HTMLDivElement) => this.toolbarRef = el}>
-                            {this.toolbar.map((bar) =>
-                                this.determineComponent(bar)
-                            )}
-                        </div>
-                    </div>
-                    :
-                    <div class='container'>
-                        <div id='toolbar' class='toolbar top' ref={(el: HTMLDivElement) => this.toolbarRef = el}>
-                            {this.toolbar.map((bar) =>
-                                this.determineComponent(bar)
-                            )}
-                        </div>
-                        <div class='text-container' ref={(el: HTMLDivElement) => this.div = el}>
-                            <iframe id='text-container' ref={(el: HTMLIFrameElement) => this.iframe = el}></iframe>
-                        </div>
-                    </div>
-                }
+        return [
+            <div id='toolbar' class='toolbar bottom' ref={(el: HTMLDivElement) => this.toolbarRef = el}>
+                {this.toolbar.map((bar) =>
+                    this.determineComponent(bar)
+                )}
+            </div>,
+            <div class='text-container' ref={(el: HTMLDivElement) => this.div = el}>
+                <iframe id='text-container' ref={(el: HTMLIFrameElement) => this.iframe = el}></iframe>
             </div>
-        )
+        ];
     }
 }

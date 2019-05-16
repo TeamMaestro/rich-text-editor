@@ -67,25 +67,23 @@ export class LinkPopoverComponent {
 	}
 
 	render() {
-		return (
-			<div>
-				<div class='arrow'></div>
-				<div class='info-container'>
-					<input id="link-input" placeholder="https://" value={(this.creating) ? null : this.url} onKeyUp={($event: KeyboardEvent) => this.handleKeyUp($event)}></input>
-					{(!this.text) ?
-						<input id="text-input" placeholder="Text to display" value={this.text} onKeyUp={($event: KeyboardEvent) => this.handleKeyUp($event)}></input>
-						: null
-					}
-					<div class="button-container">
-						<div class='button' onClick={() => this.actionHandler('open', this.url, this.text)}>
-							{Icons.open}
-						</div>
-						<div class='button' onClick={() => this.actionHandler('unlink', this.url, this.text)}>
-							{Icons.unlink}
-						</div>
+		return [
+			<div class='arrow'></div>,
+			<div class='info-container'>
+				<input id="link-input" placeholder="https://" value={(this.creating) ? null : this.url} onKeyUp={($event: KeyboardEvent) => this.handleKeyUp($event)}></input>
+				{(!this.text) ?
+					<input id="text-input" placeholder="Text to display" value={this.text} onKeyUp={($event: KeyboardEvent) => this.handleKeyUp($event)}></input>
+					: null
+				}
+				<div class="button-container">
+					<div class='button' onClick={() => this.actionHandler('open', this.url, this.text)}>
+						{Icons.open}
+					</div>
+					<div class='button' onClick={() => this.actionHandler('unlink', this.url, this.text)}>
+						{Icons.unlink}
 					</div>
 				</div>
-			</div >
-		);
+			</div>
+		];
 	}
 }
