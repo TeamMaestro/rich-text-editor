@@ -769,9 +769,11 @@ export class HiveRichTextComponent {
                 this.div.setAttribute('placeholder', this.options.placeholder);
             }
 
-            this.iframe.contentDocument.body.style.fontSize = (this.options.font) ? this.options.font.size : this.font.size;
-            this.iframe.contentDocument.body.style.color = (this.options.font) ? this.options.font.color : this.font.color;
-            this.iframe.contentDocument.body.style.fontFamily = (this.options.font) ? this.options.font.family : this.font.family;
+            // set the styles on the html tag in the iframe so styling won't be removed from body
+            const html = this.iframe.contentDocument.getRootNode().firstChild as HTMLElement;
+            html.style.fontSize = (this.options.font) ? this.options.font.size : this.font.size;
+            html.style.color = (this.options.font) ? this.options.font.color : this.font.color;
+            html.style.fontFamily = (this.options.font) ? this.options.font.family : this.font.family;
         }
 
         if (this.options.position !== 'bottom') {
