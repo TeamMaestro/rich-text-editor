@@ -173,6 +173,7 @@
                 content: attr(placeholder);
                 color: #ccc;
                 position: absolute;
+                pointer-events: none;
                 top: var(--hive-rte-placeholder-position-top);
                 left: var(--hive-rte-placeholder-position-left);
                 right: var(--hive-rte-placeholder-position-right);
