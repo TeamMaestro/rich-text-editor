@@ -78,6 +78,13 @@ Where `options` can be populated with any of the following properties:
 
 &nbsp;
 
+## Events
+|Event|Description|Return|
+:---|:---|:---
+|`textChange`|Key-up event hook when the user types in the editor.|`KeyboardEvent`
+
+&nbsp;
+
 # Contributors
 
 [<img alt="Austin Miller" src="https://avatars2.githubusercontent.com/u/24658060?s=460&v=4" width="117">](https://github.com/mr-austinmiller) |

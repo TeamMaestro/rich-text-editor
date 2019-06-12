@@ -1,4 +1,4 @@
-import { Component, Element, Method, Prop, State } from '@stencil/core';
+import { Component, Element, Method, Prop, State, Event, EventEmitter } from '@stencil/core';
 import { allowedConfig } from '../../utils/allowed-config';
 import { EditorUtils } from '../../utils/editor-utils';
 import { RichTextEditorOptions } from '../../utils/options.interface';
@@ -18,6 +18,11 @@ export class HiveRichTextComponent {
     @State() colorOpen = false;
     @State() highlightOpen = false;
     @State() linkPopoverOpen = false;
+
+    /**
+     * The text change event when the user releases a key-up event in the text area
+     */
+    @Event() textChange: EventEmitter;
 
     linkPopover: HTMLHiveLinkPopoverElement;
     linkPopoverTopOffset: number = 40;
@@ -154,6 +159,8 @@ export class HiveRichTextComponent {
         if (event.keyCode === 91 || this.keycodeDown === 93) {
             this.keycodeDown = null;
         }
+
+        this.textChange.emit(event);
     }
 
     touchstart(event: MouseEvent) {

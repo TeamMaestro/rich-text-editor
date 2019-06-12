@@ -17,7 +17,7 @@
             width: 100%;
 
         }
-        
+
         hive-rich-text {
             --hive-rte-height: 400px;
             --hive-rte-width: 700px;
@@ -27,6 +27,13 @@
 
 <body>
     <hive-rich-text></hive-rich-text>
+
+    <script>
+        var richText = document.querySelector('hive-rich-text');
+        richText.addEventListener('textChange', function(ev) {
+            console.log('Rich Text Key-up Change', ev);
+        });
+    </script>
 </body>
 
 </html>

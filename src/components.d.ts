@@ -45,6 +45,10 @@ export namespace Components {
     'setContent': (value: string) => void;
   }
   interface HiveRichTextAttributes extends StencilHTMLAttributes {
+    /**
+    * The text change event when the user releases a key-up event in the text area
+    */
+    'onTextChange'?: (event: CustomEvent) => void;
     'options'?: Partial<RichTextEditorOptions>;
   }
 }
