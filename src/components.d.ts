@@ -46,6 +46,10 @@ export namespace Components {
   }
   interface HiveRichTextAttributes extends StencilHTMLAttributes {
     /**
+    * The style change event when the user clicks to apply a new style
+    */
+    'onStyleChange'?: (event: CustomEvent) => void;
+    /**
     * The text change event when the user releases a key-up event in the text area
     */
     'onTextChange'?: (event: CustomEvent) => void;
