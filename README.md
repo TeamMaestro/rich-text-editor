@@ -82,6 +82,7 @@ Where `options` can be populated with any of the following properties:
 |Event|Description|Return|
 :---|:---|:---
 |`textChange`|Key-up event hook when the user types in the editor.|`KeyboardEvent`
+|`styleChange`|Style change event hook when user selects a style from the toolbar.|`CustomEvent`
 
 &nbsp;
 

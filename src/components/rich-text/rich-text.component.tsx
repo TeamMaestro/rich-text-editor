@@ -24,6 +24,11 @@ export class HiveRichTextComponent {
      */
     @Event() textChange: EventEmitter;
 
+    /**
+     * The style change event when the user clicks to apply a new style
+     */
+    @Event() styleChange: EventEmitter;
+
     linkPopover: HTMLHiveLinkPopoverElement;
     linkPopoverTopOffset: number = 40;
 
@@ -356,6 +361,14 @@ export class HiveRichTextComponent {
             }
 
             resolve();
+
+            this.styleChange.emit({
+                name: 'Style Event',
+                component,
+                event,
+                showUI,
+                value
+            });
         });
     }
 
@@ -467,6 +480,12 @@ export class HiveRichTextComponent {
                 this.highlightOpen = value;
             }
         }
+
+        this.styleChange.emit({
+            name: 'Color Change Event',
+            value,
+            type
+        });
     }
 
     // submissions
@@ -512,6 +531,11 @@ export class HiveRichTextComponent {
                 await this.style('createLink', null, true, window.location.href);
             }
         }
+
+        this.styleChange.emit({
+            name: 'Link Click Event',
+            value
+        });
     }
 
     createLinkPopover(node: Node, creating: boolean) {
@@ -588,7 +612,6 @@ export class HiveRichTextComponent {
 
     // other actions
     onActionClick(component: string, alignment?: boolean) {
-
         if (alignment && this.iframe.contentDocument.getSelection()) {
             const node = this.iframe.contentDocument.getSelection().anchorNode.parentNode as HTMLElement;
             node.style.removeProperty('text-align');
@@ -599,6 +622,11 @@ export class HiveRichTextComponent {
         }
 
         this.checkStyles();
+        this.styleChange.emit({
+            name: 'Action Click Event',
+            component,
+            alignment
+        })
     }
 
     // styling
