@@ -105,7 +105,7 @@ export class HiveRichTextComponent {
         this.iframe.contentDocument['onmousedown'] = (event: MouseEvent) => this.mousedown(event);
         this.iframe.contentDocument['touchstart'] = (event: MouseEvent) => this.touchstart(event);
 
-        if (this.options.showToolbar === 'onSelect') {
+        if (this.options.showToolbar === 'onSelect' && this.iframe) {
             this.iframe.contentDocument.body['onfocus'] = () => {
                 if (!this.toolbarRef.className.includes('show')) {
                     this.toolbarRef.className += ' show';
