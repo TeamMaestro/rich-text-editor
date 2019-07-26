@@ -114,7 +114,7 @@ export class HiveRichTextComponent {
 
             this.iframe.contentDocument.body['onblur'] = () => {
                 setTimeout(() => { // set timeout to make sure that there isn't any popovers or focus still happening
-                    if (!this.colorOpen && !this.highlightOpen && !this.linkPopoverOpen && !this.iframe.contentDocument.hasFocus()) {
+                    if (!this.colorOpen && !this.highlightOpen && !this.linkPopoverOpen && this.iframe && !this.iframe.contentDocument.hasFocus()) {
                         this.toolbarRef.classList.remove('show');
                     }
                 }, 500);
