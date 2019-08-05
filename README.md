@@ -57,6 +57,7 @@ Where `options` can be populated with any of the following properties:
 |`--hive-rte-font-family`|`Arial`|
 |`--hive-rte-font-size`|`14px`|
 |`--hive-rte-font-color`|`#626272`|
+|`--hive-rte-placeholder-color`|`#ccc`|
 |`--hive-rte-placeholder-position-top`|`10px`|
 |`--hive-rte-placeholder-position-left`|`10px`|
 |`--hive-rte-placeholder-position-right`|`none`|

@@ -11,6 +11,7 @@
     --hive-rte-placeholder-position-left: 10px;
     --hive-rte-placeholder-position-right: none;
     --hive-rte-placeholder-position-bottom: none;
+    --hive-rte-placeholder-color: #ccc;
 
     --hive-rte-max-height: none;
     --hive-rte-height: 100%;
@@ -171,9 +172,9 @@
         &.empty {
             &:before {
                 content: attr(placeholder);
-                color: #ccc;
                 position: absolute;
                 pointer-events: none;
+                color: var(--hive-rte-placeholder-color);
                 top: var(--hive-rte-placeholder-position-top);
                 left: var(--hive-rte-placeholder-position-left);
                 right: var(--hive-rte-placeholder-position-right);
