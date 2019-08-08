@@ -303,7 +303,6 @@ export class HiveRichTextComponent {
     }
 
     resetPopovers(exclude: string[] = []) {
-        this.checkForEmpty();
 
         if ((this.linkPopoverOpen || this.linkPopover) && !this.currentStates.includes('link')) {
             this.removeLinkPopover();
@@ -504,7 +503,6 @@ export class HiveRichTextComponent {
 
     focus() {
         this.iframe.contentDocument.body.focus();
-        this.checkForEmpty();
     }
 
     // links
