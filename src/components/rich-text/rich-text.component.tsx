@@ -173,6 +173,7 @@ export class HiveRichTextComponent {
     }
 
     checkForEmpty() {
+        console.log(!this.iframe.contentDocument.body.innerHTML);
         if (!this.iframe.contentDocument.body.innerHTML && !this.div.className.includes('empty')) {
             this.div.className += ' empty';
         } else {
@@ -303,7 +304,6 @@ export class HiveRichTextComponent {
     }
 
     resetPopovers(exclude: string[] = []) {
-        this.checkForEmpty();
 
         if ((this.linkPopoverOpen || this.linkPopover) && !this.currentStates.includes('link')) {
             this.removeLinkPopover();
@@ -504,7 +504,6 @@ export class HiveRichTextComponent {
 
     focus() {
         this.iframe.contentDocument.body.focus();
-        this.checkForEmpty();
     }
 
     // links
