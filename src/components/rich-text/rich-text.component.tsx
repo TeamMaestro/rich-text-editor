@@ -173,7 +173,6 @@ export class HiveRichTextComponent {
     }
 
     checkForEmpty() {
-        console.log(!this.iframe.contentDocument.body.innerHTML);
         if (!this.iframe.contentDocument.body.innerHTML && !this.div.className.includes('empty')) {
             this.div.className += ' empty';
         } else {
