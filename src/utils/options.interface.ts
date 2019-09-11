@@ -17,6 +17,7 @@ export interface RichTextEditorOptions {
 
     font?: {
         family?: string;
+        url?: string
         size?: string;
         color?: string;
     }
