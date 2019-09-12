@@ -45,7 +45,6 @@ export class HiveRichTextComponent {
     toolbar = ['bold', 'italic', 'underline', 'strikethrough', '|', 'link', '|', 'color', 'highlight']; // what components to render in the corresponding order
     font = {
         family: 'Arial',
-        url: null,
         size: '14px',
         color: '#626272'
     }
@@ -80,11 +79,6 @@ export class HiveRichTextComponent {
         setTimeout(() => {
             this.checkForEmpty();
         }, 0);
-    }
-
-    @Method()
-    setFontFamily() {
-
     }
 
     // lifecycle
@@ -789,7 +783,7 @@ export class HiveRichTextComponent {
     }
 
     // visuals
-    customize() {
+    async customize() {
         if (this.options && this.toolbarRef) {
             if (this.options.content) {
                 this.iframe.contentDocument.body.innerHTML = this.options.content;
@@ -819,11 +813,21 @@ export class HiveRichTextComponent {
             html.style.color = (this.options.font) ? this.options.font.color : this.font.color;
 
             if (this.options.font && this.options.font.url && this.options.font.family) {
-                const linkTag: HTMLLinkElement = new HTMLLinkElement();
-                linkTag.rel = 'stylesheet';
-                linkTag.type = 'text/css';
-                linkTag.href = this.options.font.url;
-                this.iframe.contentDocument.head.appendChild(linkTag);
+                const meta: HTMLMetaElement = this.iframe.contentDocument.createElement('meta');
+                meta.setAttribute('charset', 'utf-8');
+                this.iframe.contentDocument.head.appendChild(meta);
+
+                const base: HTMLBaseElement = this.iframe.contentDocument.createElement('base');
+                base.href = '/';
+                this.iframe.contentDocument.head.appendChild(base);
+
+                const style: HTMLStyleElement = this.iframe.contentDocument.createElement('style');
+                style.innerHTML = `@font-face {
+                        font-family: '${this.options.font.family}';
+                        src: url('${this.options.font.url}') format('${this.options.font.format}')
+                }`;
+                this.iframe.contentDocument.head.appendChild(style);
+
                 html.style.fontFamily = this.options.font.family;
             } else if (this.options.font && this.options.font.family) {
                 html.style.fontFamily = this.options.font.family;
@@ -846,7 +850,6 @@ export class HiveRichTextComponent {
             style['--hive-rte-font-size'] = (this.options.font) ? this.options.font.size : this.font.size;
             style['--hive-rte-font-color'] = (this.options.font) ? this.options.font.color : this.font.color;
         }
-        console.log('HEY', this.focused);
         return {
             style,
             class: {

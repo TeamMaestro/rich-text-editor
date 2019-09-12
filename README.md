@@ -43,7 +43,7 @@ Where `options` can be populated with any of the following properties:
 |`placeholder`|`Insert text...`|The text that will display when the rich editor is unfocused in the empty state.|`string`|
 |`showToolbar`|`always`|How the toolbar should be shown or hidden based on user actions |`always`, `onHover`, or `onSelect`|
 |`autoFocus`|`false`|To focus on the text component upon init.|`boolean`|
-|`font: {`</br>`family,`</br>`size,`</br>`color,`</br>`};`| `family: Arial`</br>`size: 12px`</br>`color: #626272` | To set what the font variables will be in the rich text container. | `family: string`</br>`size: string`</br>`color: string`
+|`font: {`</br>`family,`</br>`url,`<br>`format,`<br>`size,`</br>`color,`</br>`};`| `family: Arial`</br>`url: null`<br>`format: null`<br>`size: 12px`</br>`color: #626272` | To set what the font variables will be in the rich text editor. When passing through a custom font, the url will need to be the location of the font asset in relation to where its loaded when served (ex. './arial.otf' when found at https://localhost:4200/arial.otf). The format needs to be whatever the font asset format is (ex. 'woff2', 'otf', etc) in order to load correctly. | `family: string`</br>`url: string`<br>`format: string`<br>`size: string`</br>`color: string`
 
 &nbsp;
 
@@ -53,6 +53,7 @@ Where `options` can be populated with any of the following properties:
 |`--hive-rte-background`|`none`|
 |`--hive-rte-button-size`|`25px`|
 |`--hive-rte-border`|`1px solid #d1d1d1`|
+|`--hive-rte-focus-border`|`1px solid #d1d1d1`|
 |`--hive-rte-border-radius`|`0`|
 |`--hive-rte-font-family`|`Arial`|
 |`--hive-rte-font-size`|`14px`|
@@ -68,6 +69,8 @@ Where `options` can be populated with any of the following properties:
 |`--hive-rte-max-width`|`none`|
 |`--hive-rte-width`|`100%`|
 |`--hive-rte-min-width`|`0`|
+|`--hive-rte-toolbar-padding`|`10px 5px`|
+|`--hive-rte-body-padding`|`10px`|
 
 &nbsp;
 
