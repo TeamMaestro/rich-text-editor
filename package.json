@@ -8,24 +8,28 @@
         "url": "github:TeamHive/rich-text-editor"
     },
     "author": "TeamHive",
-    "module": "dist/esm/index.js",
     "main": "dist/index.js",
-    "unpkg": "dist/ionic.js",
+    "module": "dist/index.mjs",
+    "es2015": "dist/esm/index.mjs",
+    "es2017": "dist/esm/index.mjs",
     "types": "dist/types/components.d.ts",
     "collection": "dist/collection/collection-manifest.json",
+    "collection:main": "dist/collection/index.js",
+    "unpkg": "dist/testing/testing.js",
     "files": [
-        "dist/"
+        "dist/",
+        "loader/"
     ],
     "scripts": {
-        "build": "stencil build",
+        "build": "stencil build --docs",
         "start": "stencil build --dev --watch --serve",
         "test": "stencil test --spec --e2e",
-        "test.watch": "stencil test --spec --e2e --watchAll"
+        "test.watch": "stencil test --spec --e2e --watchAll",
+        "generate": "stencil generate"
     },
-    "dependencies": {},
     "devDependencies": {
-        "@stencil/core": "^0.18.1",
-        "@stencil/sass": "^0.1.1"
+        "@stencil/core": "^1.2.3",
+        "@stencil/sass": "^1.0.1"
     },
     "license": "MIT"
 }

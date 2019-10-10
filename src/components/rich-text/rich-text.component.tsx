@@ -1,4 +1,4 @@
-import { Component, Element, Method, Prop, State, Event, EventEmitter } from '@stencil/core';
+import { Component, Element, Event, EventEmitter, h, Method, Prop, State } from '@stencil/core';
 import { allowedConfig } from '../../utils/allowed-config';
 import { EditorUtils } from '../../utils/editor-utils';
 import { RichTextEditorOptions } from '../../utils/options.interface';
@@ -74,10 +74,11 @@ export class HiveRichTextComponent {
     }
 
     @Method()
-    setContent(value: string) {
+    async setContent(value: string) {
         this.iframe.contentDocument.body.innerHTML = value;
         setTimeout(() => {
             this.checkForEmpty();
+            return;
         }, 0);
     }
 
@@ -115,6 +116,8 @@ export class HiveRichTextComponent {
             }
         }
 
+        this.iframe.contentDocument.execCommand('defaultParagraphSeparator', false, 'h1');
+
         this.iframe.contentDocument.body['onblur'] = () => {
             this.focused = false;
             if (this.options.showToolbar === 'onSelect' && this.iframe) {
@@ -147,6 +150,9 @@ export class HiveRichTextComponent {
                     this.toggleActiveState('underline');
                     break;
             }
+        } else if (event.keyCode === 13) {
+            event.preventDefault();
+            this.iframe.contentDocument.execCommand('insertHTML', false, `<br><br>`);
         }
     }
 
@@ -170,6 +176,7 @@ export class HiveRichTextComponent {
             this.keycodeDown = null;
         }
 
+        this.cleanText();
         this.textChange.emit(event);
     }
 
@@ -197,7 +204,7 @@ export class HiveRichTextComponent {
                     break;
                 case 'color':
                     element =
-                        <div class='button-container'>
+                        <div title={this.determineTitle(component)} class='button-container'>
                             <div id={component} class={component + ' button'} onClick={() => this.onColorClick(!this.colorOpen, 'color')}>
                                 {Icons.color}
                             </div>
@@ -207,7 +214,7 @@ export class HiveRichTextComponent {
                     break;
                 case 'highlight':
                     element =
-                        <div class='button-container'>
+                        <div title={this.determineTitle(component)} class='button-container'>
                             <div id={component} class={component + ' button'} onClick={() => this.onColorClick(!this.highlightOpen, 'highlight')}>
                                 {Icons.highlight}
                             </div>
@@ -217,7 +224,7 @@ export class HiveRichTextComponent {
                     break;
                 case 'link':
                     element =
-                        <div class='button-container'>
+                        <div title={this.determineTitle(component)} class='button-container'>
                             <div class={component + ' button'} onClick={() => this.onLinkClick(!this.linkPopoverOpen)}>
                                 {Icons.link}
                             </div>
@@ -226,7 +233,7 @@ export class HiveRichTextComponent {
                     break;
                 case 'undo':
                     element =
-                        <div class='button-container'>
+                        <div title={this.determineTitle(component)} class='button-container'>
                             <div class={component + ' button'} onClick={() => this.onActionClick(component)}>
                                 {Icons[component]}
                             </div>
@@ -235,7 +242,7 @@ export class HiveRichTextComponent {
                     break;
                 case 'redo':
                     element =
-                        <div class='button-container'>
+                        <div title={this.determineTitle(component)} class='button-container'>
                             <div class={component + ' button'} onClick={() => this.onActionClick(component)}>
                                 {Icons[component]}
                             </div>
@@ -244,7 +251,7 @@ export class HiveRichTextComponent {
                     break;
                 case 'orderedList':
                     element =
-                        <div class='button-container'>
+                        <div title={this.determineTitle(component)} class='button-container'>
                             <div class={component + ' button'} onClick={() => this.onActionClick('insertOrderedList')}>
                                 {Icons[component]}
                             </div>
@@ -253,7 +260,7 @@ export class HiveRichTextComponent {
                     break;
                 case 'unorderedList':
                     element =
-                        <div class='button-container'>
+                        <div title={this.determineTitle(component)} class='button-container'>
                             <div class={component + ' button'} onClick={() => this.onActionClick('insertUnorderedList')}>
                                 {Icons[component]}
                             </div>
@@ -262,7 +269,7 @@ export class HiveRichTextComponent {
                     break;
                 case 'justifyFull':
                     element =
-                        <div class='button-container'>
+                        <div title={this.determineTitle(component)} class='button-container'>
                             <div class={component + ' button'} onClick={() => this.onActionClick(component, true)}>
                                 {Icons[component]}
                             </div>
@@ -271,7 +278,7 @@ export class HiveRichTextComponent {
                     break;
                 case 'justifyCenter':
                     element =
-                        <div class='button-container'>
+                        <div title={this.determineTitle(component)} class='button-container'>
                             <div class={component + ' button'} onClick={() => this.onActionClick(component, true)}>
                                 {Icons[component]}
                             </div>
@@ -280,7 +287,7 @@ export class HiveRichTextComponent {
                     break;
                 case 'justifyLeft':
                     element =
-                        <div class='button-container'>
+                        <div title={this.determineTitle(component)} class='button-container'>
                             <div class={component + ' button'} onClick={() => this.onActionClick(component, true)}>
                                 {Icons[component]}
                             </div>
@@ -289,7 +296,7 @@ export class HiveRichTextComponent {
                     break;
                 case 'justifyRight':
                     element =
-                        <div class='button-container'>
+                        <div title="Justify Right" class='button-container'>
                             <div class={component + ' button'} onClick={() => this.onActionClick(component, true)}>
                                 {Icons[component]}
                             </div>
@@ -298,7 +305,7 @@ export class HiveRichTextComponent {
                     break;
                 default:
                     if (allowedConfig.includes(component)) {
-                        element = <div class={component + ' button'} onClick={($event: UIEvent) => this.style(component, $event)}>{Icons[component]}</div>
+                        element = <div title={this.determineTitle(component)} class={component + ' button'} onClick={($event: UIEvent) => this.style(component, $event)}>{Icons[component]}</div>
                         this.addedToToolbar.push(component);
                     }
                     break;
@@ -307,8 +314,16 @@ export class HiveRichTextComponent {
         }
     }
 
-    resetPopovers(exclude: string[] = []) {
+    determineTitle(title: string) {
+        const array = title.split(/(?=[A-Z])/);
+        let value: string = '';
+        array.forEach(s => {
+            value += s.substring(0, 1).toUpperCase() + s.substring(1, s.length) + ' ';
+        })
+        return value.trim();
+    }
 
+    resetPopovers(exclude: string[] = []) {
         if ((this.linkPopoverOpen || this.linkPopover) && !this.currentStates.includes('link')) {
             this.removeLinkPopover();
         }
@@ -366,6 +381,7 @@ export class HiveRichTextComponent {
 
             resolve();
 
+            this.cleanText();
             this.styleChange.emit({
                 name: 'Style Event',
                 component,
@@ -485,6 +501,7 @@ export class HiveRichTextComponent {
             }
         }
 
+        this.cleanText();
         this.styleChange.emit({
             name: 'Color Change Event',
             value,
@@ -535,6 +552,7 @@ export class HiveRichTextComponent {
             }
         }
 
+        this.cleanText();
         this.styleChange.emit({
             name: 'Link Click Event',
             value
@@ -547,21 +565,21 @@ export class HiveRichTextComponent {
         if (!(node as HTMLAnchorElement).href) {
             this.createLinkPopover(node.parentElement, creating);
         } else {
-            this.linkPopover.addEventListener('action', (event: CustomEvent) => {
+            (this.linkPopover as unknown as HTMLElement).addEventListener('action', (event: CustomEvent) => {
                 this.linkActionHandler(event.detail, node as HTMLAnchorElement);
             });
 
             let top = (node as HTMLAnchorElement).offsetTop + this.linkPopoverTopOffset;
             let left = (node as HTMLAnchorElement).offsetLeft + 5;
 
-            this.linkPopover.style.top = (top) + 'px';
-            this.linkPopover.style.left = (left) + 'px';
+            (this.linkPopover as unknown as HTMLElement).style.top = (top) + 'px';
+            (this.linkPopover as unknown as HTMLElement).style.left = (left) + 'px';
 
             this.linkPopover.creating = creating;
             this.linkPopover.url = (node as HTMLAnchorElement).href;
             this.linkPopover.text = (node as HTMLAnchorElement).innerText;
 
-            this.el.shadowRoot.appendChild(this.linkPopover);
+            this.el.shadowRoot.appendChild((this.linkPopover as unknown as HTMLElement));
 
             this.creatingLink = false;
         }
@@ -570,7 +588,7 @@ export class HiveRichTextComponent {
     removeLinkPopover() {
         if (this.linkPopover) {
             this.linkPopoverOpen = false;
-            this.linkPopover.remove();
+            (this.linkPopover as unknown as HTMLElement).remove();
             this.linkPopover = null;
             this.linkNode = null;
         }
@@ -578,7 +596,7 @@ export class HiveRichTextComponent {
 
     async linkActionHandler({ action, url, text }, node: HTMLAnchorElement) {
         this.linkPopoverOpen = false;
-        this.linkPopover.remove();
+        (this.linkPopover as unknown as HTMLElement).remove();
 
         if (!text) {
             node.remove();
@@ -625,6 +643,7 @@ export class HiveRichTextComponent {
         }
 
         this.checkStyles();
+        this.cleanText();
         this.styleChange.emit({
             name: 'Action Click Event',
             component,
@@ -749,7 +768,6 @@ export class HiveRichTextComponent {
                 this.linkPopoverOpen = true;
                 this.createLinkPopover(node, this.creatingLink);
             }
-
         } else if (!value && button) {
             button.className = component + ' button';
 
@@ -779,6 +797,27 @@ export class HiveRichTextComponent {
             const parent: HTMLElement = await this.getContainer(topLevel.parentNode);
 
             resolve(parent);
+        });
+    }
+
+    cleanText() {
+        const nodes = this.iframe.contentDocument.body.childNodes;
+        nodes.forEach(n => {
+            if (n.nodeName.toLowerCase() === 'div') {
+                const br = this.iframe.contentDocument.createElement('br');
+                const text = (n as HTMLDivElement).innerHTML;
+
+                n.replaceWith(br);
+
+                if (text !== '<br>') {
+                    br.insertAdjacentHTML('afterend', text);
+                    this.iframe.contentDocument.getSelection().getRangeAt(0).setStartAfter(br);
+                }
+            } else if (n.nodeName.toLowerCase() === 'a') {
+                if (!(n as HTMLAnchorElement).innerText && !this.linkPopover) {
+                    n.remove();
+                }
+            }
         });
     }
 

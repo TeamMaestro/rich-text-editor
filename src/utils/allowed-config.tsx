@@ -8,6 +8,7 @@ export const allowedConfig: string[] = [
     'link',
     'textColor',
     'backgroundColor',
+    'removeFormat',
     'undo',
     'redo',
     'superscript',

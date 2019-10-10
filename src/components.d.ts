@@ -5,70 +5,30 @@
  */
 
 
-import '@stencil/core';
-
-
+import { HTMLStencilElement, JSXBase } from '@stencil/core/internal';
 import {
   RichTextEditorOptions,
 } from './utils/options.interface';
 
-
 export namespace Components {
-
   interface HiveColorPopover {
     'colors': string[];
     'isOpen': boolean;
     'position': 'top' | 'bottom';
   }
-  interface HiveColorPopoverAttributes extends StencilHTMLAttributes {
-    'colors'?: string[];
-    'isOpen'?: boolean;
-    'onColorSelected'?: (event: CustomEvent) => void;
-    'position'?: 'top' | 'bottom';
-  }
-
   interface HiveLinkPopover {
     'creating': boolean;
     'text': string;
     'url': string;
   }
-  interface HiveLinkPopoverAttributes extends StencilHTMLAttributes {
-    'creating'?: boolean;
-    'onAction'?: (event: CustomEvent) => void;
-    'text'?: string;
-    'url'?: string;
-  }
-
   interface HiveRichText {
     'getContent': () => Promise<{ text: string; html: string; }>;
     'options': Partial<RichTextEditorOptions>;
-    'setContent': (value: string) => void;
-  }
-  interface HiveRichTextAttributes extends StencilHTMLAttributes {
-    /**
-    * The style change event when the user clicks to apply a new style
-    */
-    'onStyleChange'?: (event: CustomEvent) => void;
-    /**
-    * The text change event when the user releases a key-up event in the text area
-    */
-    'onTextChange'?: (event: CustomEvent) => void;
-    'options'?: Partial<RichTextEditorOptions>;
+    'setContent': (value: string) => Promise<void>;
   }
 }
 
 declare global {
-  interface StencilElementInterfaces {
-    'HiveColorPopover': Components.HiveColorPopover;
-    'HiveLinkPopover': Components.HiveLinkPopover;
-    'HiveRichText': Components.HiveRichText;
-  }
-
-  interface StencilIntrinsicElements {
-    'hive-color-popover': Components.HiveColorPopoverAttributes;
-    'hive-link-popover': Components.HiveLinkPopoverAttributes;
-    'hive-rich-text': Components.HiveRichTextAttributes;
-  }
 
 
   interface HTMLHiveColorPopoverElement extends Components.HiveColorPopover, HTMLStencilElement {}
@@ -88,26 +48,56 @@ declare global {
     prototype: HTMLHiveRichTextElement;
     new (): HTMLHiveRichTextElement;
   };
-
   interface HTMLElementTagNameMap {
-    'hive-color-popover': HTMLHiveColorPopoverElement
-    'hive-link-popover': HTMLHiveLinkPopoverElement
-    'hive-rich-text': HTMLHiveRichTextElement
-  }
-
-  interface ElementTagNameMap {
     'hive-color-popover': HTMLHiveColorPopoverElement;
     'hive-link-popover': HTMLHiveLinkPopoverElement;
     'hive-rich-text': HTMLHiveRichTextElement;
   }
+}
+
+declare namespace LocalJSX {
+  interface HiveColorPopover {
+    'colors'?: string[];
+    'isOpen'?: boolean;
+    'onColorSelected'?: (event: CustomEvent<any>) => void;
+    'position'?: 'top' | 'bottom';
+  }
+  interface HiveLinkPopover {
+    'creating'?: boolean;
+    'onAction'?: (event: CustomEvent<any>) => void;
+    'text'?: string;
+    'url'?: string;
+  }
+  interface HiveRichText {
+    /**
+    * The style change event when the user clicks to apply a new style
+    */
+    'onStyleChange'?: (event: CustomEvent<any>) => void;
+    /**
+    * The text change event when the user releases a key-up event in the text area
+    */
+    'onTextChange'?: (event: CustomEvent<any>) => void;
+    'options'?: Partial<RichTextEditorOptions>;
+  }
+
+  interface IntrinsicElements {
+    'hive-color-popover': HiveColorPopover;
+    'hive-link-popover': HiveLinkPopover;
+    'hive-rich-text': HiveRichText;
+  }
+}
+
+export { LocalJSX as JSX };
 
 
+declare module "@stencil/core" {
   export namespace JSX {
-    export interface Element {}
-    export interface IntrinsicElements extends StencilIntrinsicElements {
-      [tagName: string]: any;
+    interface IntrinsicElements {
+      'hive-color-popover': LocalJSX.HiveColorPopover & JSXBase.HTMLAttributes<HTMLHiveColorPopoverElement>;
+      'hive-link-popover': LocalJSX.HiveLinkPopover & JSXBase.HTMLAttributes<HTMLHiveLinkPopoverElement>;
+      'hive-rich-text': LocalJSX.HiveRichText & JSXBase.HTMLAttributes<HTMLHiveRichTextElement>;
     }
   }
-  export interface HTMLAttributes extends StencilHTMLAttributes {}
-
 }
+
+

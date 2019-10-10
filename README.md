@@ -35,7 +35,7 @@ Where `options` can be populated with any of the following properties:
 ## Properties
 |Property|Default|Description|Values|
 :---|:---|:---|:---
-|`toolbar`|`['bold', 'italic', 'underline', 'strikethrough', '\|', 'link', '\|', 'color', 'highlight']`|The components that will show up in the toolbar.|`bold, italic, underline, strikethrough, link, color, highlight, undo, redo, superscript, subscript, orderedList, unorderedList, -, \|`|
+|`toolbar`|`['bold', 'italic', 'underline', 'strikethrough', '\|', 'link', '\|', 'color', 'highlight']`|The components that will show up in the toolbar.|`bold, italic, underline, strikethrough, link, color, highlight, undo, redo, superscript, subscript, orderedList, unorderedList, removeFormat, -, \|`|
 |`colors`|`['#FF4541', '#E65100', '#43A047', '#1C9BE6', '#6446EB', '#ACACC2', '#626272']`|The colors that will show up for a quick selection when formating text color.|Any valid hex code|
 |`highlights`|`['#f3f315', '#ff0099', '#83f52c', '#ff6600', '#6e0dd0']`|The colors that will show up for a quick selection when formating highlight color.|Any valid hex code|
 |`position`|`top`|The position of the toolbar in relation to the text container.|`top` or `bottom`|
