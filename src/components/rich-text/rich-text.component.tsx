@@ -18,6 +18,7 @@ export class HiveRichTextComponent {
     @State() colorOpen = false;
     @State() highlightOpen = false;
     @State() linkPopoverOpen = false;
+    @State() focused = false;
 
     /**
      * The text change event when the user releases a key-up event in the text area
@@ -105,14 +106,18 @@ export class HiveRichTextComponent {
         this.iframe.contentDocument['onmousedown'] = (event: MouseEvent) => this.mousedown(event);
         this.iframe.contentDocument['touchstart'] = (event: MouseEvent) => this.touchstart(event);
 
-        if (this.options.showToolbar === 'onSelect' && this.iframe) {
-            this.iframe.contentDocument.body['onfocus'] = () => {
+        this.iframe.contentDocument.body['onfocus'] = () => {
+            this.focused = true;
+            if (this.options.showToolbar === 'onSelect' && this.iframe) {
                 if (!this.toolbarRef.className.includes('show')) {
                     this.toolbarRef.className += ' show';
                 }
             }
+        }
 
-            this.iframe.contentDocument.body['onblur'] = () => {
+        this.iframe.contentDocument.body['onblur'] = () => {
+            this.focused = false;
+            if (this.options.showToolbar === 'onSelect' && this.iframe) {
                 setTimeout(() => { // set timeout to make sure that there isn't any popovers or focus still happening
                     if (!this.colorOpen && !this.highlightOpen && !this.linkPopoverOpen && this.iframe && !this.iframe.contentDocument.hasFocus()) {
                         this.toolbarRef.classList.remove('show');
@@ -778,7 +783,7 @@ export class HiveRichTextComponent {
     }
 
     // visuals
-    customize() {
+    async customize() {
         if (this.options && this.toolbarRef) {
             if (this.options.content) {
                 this.iframe.contentDocument.body.innerHTML = this.options.content;
@@ -806,7 +811,29 @@ export class HiveRichTextComponent {
             const html = this.iframe.contentDocument.getRootNode().firstChild as HTMLElement;
             html.style.fontSize = (this.options.font) ? this.options.font.size : this.font.size;
             html.style.color = (this.options.font) ? this.options.font.color : this.font.color;
-            html.style.fontFamily = (this.options.font) ? this.options.font.family : this.font.family;
+
+            if (this.options.font && this.options.font.url && this.options.font.family) {
+                const meta: HTMLMetaElement = this.iframe.contentDocument.createElement('meta');
+                meta.setAttribute('charset', 'utf-8');
+                this.iframe.contentDocument.head.appendChild(meta);
+
+                const base: HTMLBaseElement = this.iframe.contentDocument.createElement('base');
+                base.href = '/';
+                this.iframe.contentDocument.head.appendChild(base);
+
+                const style: HTMLStyleElement = this.iframe.contentDocument.createElement('style');
+                style.innerHTML = `@font-face {
+                        font-family: '${this.options.font.family}';
+                        src: url('${this.options.font.url}') format('${this.options.font.format}')
+                }`;
+                this.iframe.contentDocument.head.appendChild(style);
+
+                html.style.fontFamily = this.options.font.family;
+            } else if (this.options.font && this.options.font.family) {
+                html.style.fontFamily = this.options.font.family;
+            } else {
+                html.style.fontFamily = this.font.family;
+            }
         }
 
         if (this.options.position !== 'bottom') {
@@ -823,10 +850,10 @@ export class HiveRichTextComponent {
             style['--hive-rte-font-size'] = (this.options.font) ? this.options.font.size : this.font.size;
             style['--hive-rte-font-color'] = (this.options.font) ? this.options.font.color : this.font.color;
         }
-
         return {
             style,
             class: {
+                'focused': this.focused,
                 'position-top': (this.options) ? this.options.position !== 'bottom' : true,
                 'position-bottom': (this.options) ? this.options.position === 'bottom' : false
             }
