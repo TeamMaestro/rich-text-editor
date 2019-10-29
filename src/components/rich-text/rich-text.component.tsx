@@ -1,4 +1,4 @@
-import { Component, Element, Event, EventEmitter, h, Method, Prop, State, Watch } from '@stencil/core';
+import { Component, Element, Event, EventEmitter, h, Method, Prop, State } from '@stencil/core';
 import { allowedConfig } from '../../utils/allowed-config';
 import { EditorUtils } from '../../utils/editor-utils';
 import { RichTextEditorOptions } from '../../utils/options.interface';
@@ -21,8 +21,6 @@ export class HiveRichTextComponent {
     @State() highlightOpen = false;
     @State() linkPopoverOpen = false;
     @State() focused = false;
-
-    @Prop({ mutable: true }) value: string;
 
     /**
      * The text change event when the user releases a key-up event in the text area
@@ -53,25 +51,10 @@ export class HiveRichTextComponent {
         color: '#626272'
     }
 
-    @State() frameValue: string;
-
     // customize
     @Prop() options: Partial<RichTextEditorOptions> = {
         placeholder: 'Insert text...'
     };
-
-    @Watch('frameValue')
-    frameValueChange(newValue: string) {
-        // Update the property value of the iframe contents
-        this.value = newValue;
-    }
-
-    @Watch('value')
-    valueChange(newValue: string, oldValue: string) {
-        if (newValue !== oldValue) {
-            this.setContent(newValue);
-        }
-    }
 
     // states
     anchorEvent: MouseEvent | TouchEvent;
@@ -104,11 +87,6 @@ export class HiveRichTextComponent {
     componentDidLoad() {
         this.setupIframe();
         this.customize();
-
-        if (this.value) {
-            this.setContent(this.value);
-        }
-
         if (this.fontSmoothing) {
             // Enables webkit font smoothing
             this.iframe.contentDocument.body.style['-webkit-font-smoothing'] = 'antialiased';
@@ -212,8 +190,8 @@ export class HiveRichTextComponent {
     }
 
     checkForEmpty() {
-        this.frameValue = this.iframe.contentDocument.body.innerHTML;
-        if (this.frameValue.length < 1) {
+        const html = this.iframe.contentDocument.body.innerHTML;
+        if (html.length < 1) {
             this.div.classList.add('empty');
         } else {
             this.div.classList.remove('empty');

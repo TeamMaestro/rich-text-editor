@@ -26,7 +26,6 @@ export namespace Components {
     'getContent': () => Promise<{ text: string; html: string; }>;
     'options': Partial<RichTextEditorOptions>;
     'setContent': (value: string) => Promise<void>;
-    'value': string;
   }
 }
 
@@ -81,7 +80,6 @@ declare namespace LocalJSX {
     */
     'onTextChange'?: (event: CustomEvent<any>) => void;
     'options'?: Partial<RichTextEditorOptions>;
-    'value'?: string;
   }
 
   interface IntrinsicElements {
