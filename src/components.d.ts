@@ -22,9 +22,11 @@ export namespace Components {
     'url': string;
   }
   interface HiveRichText {
+    'fontSmoothing': boolean;
     'getContent': () => Promise<{ text: string; html: string; }>;
     'options': Partial<RichTextEditorOptions>;
     'setContent': (value: string) => Promise<void>;
+    'value': string;
   }
 }
 
@@ -69,6 +71,7 @@ declare namespace LocalJSX {
     'url'?: string;
   }
   interface HiveRichText {
+    'fontSmoothing'?: boolean;
     /**
     * The style change event when the user clicks to apply a new style
     */
@@ -78,6 +81,7 @@ declare namespace LocalJSX {
     */
     'onTextChange'?: (event: CustomEvent<any>) => void;
     'options'?: Partial<RichTextEditorOptions>;
+    'value'?: string;
   }
 
   interface IntrinsicElements {
