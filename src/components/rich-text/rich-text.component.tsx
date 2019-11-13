@@ -127,7 +127,7 @@ export class HiveRichTextComponent {
             this.focused = false;
             if (this.options.showToolbar === 'onSelect' && this.iframe) {
                 setTimeout(() => { // set timeout to make sure that there isn't any popovers or focus still happening
-                    if (!this.colorOpen && !this.highlightOpen && !this.linkPopoverOpen && this.iframe && !this.iframe.contentDocument.hasFocus()) {
+                    if (!this.colorOpen && !this.highlightOpen && !this.linkPopoverOpen && this.iframe && this.iframe.contentDocument && !this.iframe.contentDocument.hasFocus()) {
                         this.toolbarRef.classList.remove('show');
                     }
                 }, 500);
