@@ -601,8 +601,7 @@ export class HiveRichTextComponent {
     }
 
     async linkActionHandler({ action, url, text }, node: HTMLAnchorElement) {
-        this.linkPopoverOpen = false;
-        (this.linkPopover as unknown as HTMLElement).remove();
+        this.removeLinkPopover();
 
         if (!text) {
             node.remove();
@@ -624,6 +623,11 @@ export class HiveRichTextComponent {
                     node.innerText = text;
                     node.href = url;
                     node.target = '_blank';
+                    const range = this.iframe.contentDocument.createRange();
+                    range.setStart(node, 1 || 0);
+
+                    this.iframe.contentDocument.getSelection().empty();
+                    this.iframe.contentDocument.getSelection().addRange(range);
                     this.focus();
                     break;
                 case 'unlink':
