@@ -635,6 +635,10 @@ export class HiveRichTextComponent {
                     break;
             }
         }
+        this.styleChange.emit({
+            name: 'Style Event',
+            event
+        });
     }
 
     // other actions
