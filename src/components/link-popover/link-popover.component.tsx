@@ -57,12 +57,24 @@ export class LinkPopoverComponent {
 			this.textInput = this.el.shadowRoot.querySelector('#text-input') as HTMLInputElement;
 		}
 
-		this.el['onblur'] = () => this.checkDestroy();
+		this.el['onblur'] = () => this.updateData();
 	}
 
 	checkDestroy() {
 		if (!this.submit && (!this.text || !this.linkInput.value)) {
 			this.actionHandler('destroy', null, this.text);
+		}
+	}
+
+	updateData() {
+		if (!this.submit) {
+			let text = this.linkInput.value;
+			if (this.textInput && !!this.textInput.value) {
+				text = this.textInput.value;
+			} else if (!!this.text) {
+				text = this.text;
+			}
+			this.actionHandler('edit', this.linkInput.value, text);
 		}
 	}
 
