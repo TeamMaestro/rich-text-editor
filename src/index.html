@@ -53,7 +53,6 @@
 
     function updatePreview(data) {
         rte.getContent().then(function(contentData) {
-            console.log(contentData.html);
             preview.innerHTML = contentData.html;
         })
     }
