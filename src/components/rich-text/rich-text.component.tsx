@@ -44,7 +44,7 @@ export class HiveRichTextComponent {
 
     colors = ['#FF4541', '#E65100', '#43A047', '#1C9BE6', '#6446EB', '#ACACC2', '#626272']; // default colors for text color selection
     highlights = ['#f3f315', '#ff0099', '#83f52c', '#ff6600', '#6e0dd0']; // default colors for highlighting selection
-    toolbar = ['bold', 'italic', 'underline', 'strikethrough', '|', 'link', '|', 'color', 'highlight']; // what components to render in the corresponding order
+    toolbar = ['bold', 'italic', 'underline', 'strikethrough', '|', 'color', 'highlight', '|', 'link', '|', 'orderedList', 'unorderedList']; // what components to render in the corresponding order
     font = {
         family: 'Arial',
         size: '14px',
@@ -156,8 +156,36 @@ export class HiveRichTextComponent {
                     break;
             }
         } else if (event.keyCode === 13) {
-            event.preventDefault();
-            this.iframe.contentDocument.execCommand('insertHTML', false, `<br><br>`);
+            const thisListItem = this.iframe.contentDocument.getSelection().focusNode.parentElement.closest('li') || this.iframe.contentDocument.getSelection().focusNode;
+            
+            const list = thisListItem.parentElement;
+
+                if (list != null && list.children[list.childElementCount - 1] !== thisListItem && list.nextSibling == null) {
+                    // Handle the enter key if caret is not within a list
+                    if (thisListItem == null || thisListItem.nodeName !== 'LI') {
+                        event.preventDefault();
+                        this.iframe.contentDocument.execCommand('insertHTML', false, `<br><br>`);
+                    }
+                }
+        }
+        else if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+
+            // Handle the cursor position if the list is at the beginning or the end of the document
+            const thisListItem = this.iframe.contentDocument.getSelection().focusNode.parentElement.closest('li');
+            if (thisListItem != null) {
+                const list = thisListItem.parentElement;
+
+                if (list != null) {
+                    if (event.key === 'ArrowUp' && list.children[0] === thisListItem && list.previousSibling == null) {
+                        const startBreak = this.iframe.contentDocument.createElement('br');
+                        this.iframe.contentDocument.body.insertBefore(startBreak, list);
+                    }
+                    else if (event.key === 'ArrowDown' && list.children[list.childElementCount - 1] === thisListItem && list.nextSibling == null) {
+                        const endBreak = this.iframe.contentDocument.createElement('br');
+                        this.iframe.contentDocument.body.appendChild(endBreak);
+                    }
+                }
+            }
         }
     }
 
@@ -258,7 +286,7 @@ export class HiveRichTextComponent {
                 case 'orderedList':
                     element =
                         <div title={this.determineTitle(component)} class='button-container'>
-                            <div class={component + ' button'} onClick={() => this.onActionClick('insertOrderedList')}>
+                            <div class={component + ' button'} onClick={() => this.onActionClick('insertOrderedList', { focus: true })}>
                                 {Icons[component]}
                             </div>
                         </div>
@@ -267,7 +295,7 @@ export class HiveRichTextComponent {
                 case 'unorderedList':
                     element =
                         <div title={this.determineTitle(component)} class='button-container'>
-                            <div class={component + ' button'} onClick={() => this.onActionClick('insertUnorderedList')}>
+                            <div class={component + ' button'} onClick={() => this.onActionClick('insertUnorderedList', { focus: true })}>
                                 {Icons[component]}
                             </div>
                         </div>
@@ -276,7 +304,7 @@ export class HiveRichTextComponent {
                 case 'justifyFull':
                     element =
                         <div title={this.determineTitle(component)} class='button-container'>
-                            <div class={component + ' button'} onClick={() => this.onActionClick(component, true)}>
+                            <div class={component + ' button'} onClick={() => this.onActionClick(component, { alignment: true })}>
                                 {Icons[component]}
                             </div>
                         </div>
@@ -285,7 +313,7 @@ export class HiveRichTextComponent {
                 case 'justifyCenter':
                     element =
                         <div title={this.determineTitle(component)} class='button-container'>
-                            <div class={component + ' button'} onClick={() => this.onActionClick(component, true)}>
+                            <div class={component + ' button'} onClick={() => this.onActionClick(component, { alignment: true })}>
                                 {Icons[component]}
                             </div>
                         </div>
@@ -294,7 +322,7 @@ export class HiveRichTextComponent {
                 case 'justifyLeft':
                     element =
                         <div title={this.determineTitle(component)} class='button-container'>
-                            <div class={component + ' button'} onClick={() => this.onActionClick(component, true)}>
+                            <div class={component + ' button'} onClick={() => this.onActionClick(component, { alignment: true })}>
                                 {Icons[component]}
                             </div>
                         </div>
@@ -303,7 +331,7 @@ export class HiveRichTextComponent {
                 case 'justifyRight':
                     element =
                         <div title="Justify Right" class='button-container'>
-                            <div class={component + ' button'} onClick={() => this.onActionClick(component, true)}>
+                            <div class={component + ' button'} onClick={() => this.onActionClick(component, { alignment: true })}>
                                 {Icons[component]}
                             </div>
                         </div>
@@ -646,8 +674,11 @@ export class HiveRichTextComponent {
     }
 
     // other actions
-    onActionClick(component: string, alignment?: boolean) {
-        if (alignment && this.iframe.contentDocument.getSelection()) {
+    onActionClick(component: string, options: {
+        alignment?: boolean;
+        focus?: boolean } = {}
+    ) {
+        if (options.alignment && this.iframe.contentDocument.getSelection()) {
             const node = this.iframe.contentDocument.getSelection().anchorNode.parentNode as HTMLElement;
             node.style.removeProperty('text-align');
 
@@ -656,12 +687,16 @@ export class HiveRichTextComponent {
             this.iframe.contentDocument.execCommand(component);
         }
 
+        if (options.focus === true) {
+            this.focus();
+        }
+
         this.checkStyles();
         this.cleanText();
         this.styleChange.emit({
             name: 'Action Click Event',
             component,
-            alignment
+            alignment: options.alignment
         })
     }
 
