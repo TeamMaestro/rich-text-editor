@@ -44,7 +44,7 @@ export class HiveRichTextComponent {
 
     colors = ['#FF4541', '#E65100', '#43A047', '#1C9BE6', '#6446EB', '#ACACC2', '#626272']; // default colors for text color selection
     highlights = ['#f3f315', '#ff0099', '#83f52c', '#ff6600', '#6e0dd0']; // default colors for highlighting selection
-    toolbar = ['bold', 'italic', 'underline', 'strikethrough', '|', 'link', '|', 'color', 'highlight']; // what components to render in the corresponding order
+    toolbar = ['bold', 'italic', 'underline', 'strikethrough', '|', 'color', 'highlight', '|', 'link', '|', 'orderedList', 'unorderedList']; // what components to render in the corresponding order
     font = {
         family: 'Arial',
         size: '14px',
