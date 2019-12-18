@@ -159,6 +159,19 @@ export class HiveRichTextComponent {
             event.preventDefault();
             this.iframe.contentDocument.execCommand('insertHTML', false, `<br><br>`);
         }
+        else if (event.key === 'ArrowUp') {
+            const thisListItem = this.iframe.contentDocument.getSelection().focusNode.parentElement.closest('li');
+            if (thisListItem != null) {
+                const list = thisListItem.parentElement;
+
+                if (list != null) {
+                    if (list.children[0] === thisListItem && list.previousSibling == null) {
+                        const startBreak = this.iframe.contentDocument.createElement('br');
+                        this.iframe.contentDocument.body.insertBefore(startBreak, list);
+                    }
+                }
+            }
+        }
     }
 
     keyup(event: KeyboardEvent) {
@@ -258,7 +271,7 @@ export class HiveRichTextComponent {
                 case 'orderedList':
                     element =
                         <div title={this.determineTitle(component)} class='button-container'>
-                            <div class={component + ' button'} onClick={() => this.onActionClick('insertOrderedList')}>
+                            <div class={component + ' button'} onClick={() => this.onListClick('insertOrderedList')}>
                                 {Icons[component]}
                             </div>
                         </div>
@@ -267,7 +280,7 @@ export class HiveRichTextComponent {
                 case 'unorderedList':
                     element =
                         <div title={this.determineTitle(component)} class='button-container'>
-                            <div class={component + ' button'} onClick={() => this.onActionClick('insertUnorderedList')}>
+                            <div class={component + ' button'} onClick={() => this.onListClick('insertUnorderedList')}>
                                 {Icons[component]}
                             </div>
                         </div>
@@ -513,6 +526,39 @@ export class HiveRichTextComponent {
             value,
             type
         });
+    }
+
+    // Lists
+    onListClick(action: 'insertOrderedList' | 'insertUnorderedList') {
+        let tagName;
+
+        switch(action) {
+            case 'insertOrderedList':
+                tagName = 'ol';
+                break;
+            case 'insertUnorderedList':
+                tagName = 'ul'
+                break;
+            default:
+                return;
+        }
+
+        this.iframe.contentDocument.execCommand(action);
+        
+        const breakAfter = this.iframe.contentDocument.createElement('br');
+        
+        const listContainer: HTMLElement = this.iframe.contentDocument.getSelection().focusNode.parentElement.closest(tagName);
+        this.iframe.contentDocument.getSelection().getRangeAt(0).setStartAfter(listContainer);
+        this.iframe.contentDocument.getSelection().getRangeAt(0).insertNode(breakAfter);
+
+        this.focus();
+        this.checkStyles();
+        this.cleanText();
+        this.styleChange.emit({
+            name: `${action} Click Event`,
+            action
+        })
+
     }
 
     // submissions
