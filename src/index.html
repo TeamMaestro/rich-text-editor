@@ -23,11 +23,39 @@
             --hive-rte-height: 400px;
             --hive-rte-width: 700px;
         }
+
+        #preview {
+            display: block;
+            width: 500px;
+        }
     </style>
 </head>
 
 <body>
     <hive-rich-text></hive-rich-text>
+
+    <div id="preview">
+
+    </div>
 </body>
 
+<script>
+    var rte = document.querySelector('hive-rich-text');
+    var preview = document.querySelector('#preview');
+
+    rte.addEventListener('textChange', function(data) {
+        updatePreview(data);
+    });
+
+    rte.addEventListener('styleChange', function(data) {
+        updatePreview(data);
+    });
+
+    function updatePreview(data) {
+        rte.getContent().then(function(contentData) {
+            console.log(contentData.html);
+            preview.innerHTML = contentData.html;
+        })
+    }
+</script>
 </html>
