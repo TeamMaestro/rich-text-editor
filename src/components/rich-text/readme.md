@@ -33,6 +33,16 @@ Type: `Promise<{ text: string; html: string; }>`
 
 
 
+### `hiveFocus() => Promise<void>`
+
+
+
+#### Returns
+
+Type: `Promise<void>`
+
+
+
 ### `setContent(value: string) => Promise<void>`
 
 

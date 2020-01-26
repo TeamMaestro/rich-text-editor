@@ -83,6 +83,11 @@ export class HiveRichTextComponent {
         }, 0);
     }
 
+    @Method()
+    async hiveFocus() {
+        this.focus();
+    }
+
     // lifecycle
     componentDidLoad() {
         this.setupIframe();
@@ -157,7 +162,7 @@ export class HiveRichTextComponent {
             }
         } else if (event.keyCode === 13) {
             const thisListItem = this.iframe.contentDocument.getSelection().focusNode.parentElement.closest('li') || this.iframe.contentDocument.getSelection().focusNode;
-            
+
             const list = thisListItem.parentElement;
 
                 if (list != null && list.children[list.childElementCount - 1] !== thisListItem && list.nextSibling == null) {
