@@ -1,7 +1,7 @@
 import { Component, Element, Event, EventEmitter, h, Method, Prop, State } from '@stencil/core';
 import { allowedConfig } from '../../utils/allowed-config';
 import { EditorUtils } from '../../utils/editor-utils';
-import { RichTextEditorOptions } from '../../utils/options.interface';
+import { RichTextEditorOptions } from './rich-text.interface';
 import { Icons } from '../icons/icons';
 
 @Component({
