@@ -7,10 +7,10 @@
 
 ## Properties
 
-| Property        | Attribute        | Description | Type                                                                                                                                                                                                                                                                                                         | Default                                         |
-| --------------- | ---------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------- |
-| `fontSmoothing` | `font-smoothing` |             | `boolean`                                                                                                                                                                                                                                                                                                    | `true`                                          |
-| `options`       | --               |             | `{ toolbar?: string[]; colors?: string[]; highlights?: string[]; position?: "top" \| "bottom"; content?: string; placeholder?: string; showToolbar?: "always" \| "onHover" \| "onSelect"; autoFocus?: boolean; font?: { family?: string; url?: string; format?: string; size?: string; color?: string; }; }` | `{         placeholder: 'Insert text...'     }` |
+| Property        | Attribute        | Description | Type                    | Default                                         |
+| --------------- | ---------------- | ----------- | ----------------------- | ----------------------------------------------- |
+| `fontSmoothing` | `font-smoothing` |             | `boolean`               | `true`                                          |
+| `options`       | --               |             | `RichTextEditorOptions` | `{         placeholder: 'Insert text...'     }` |
 
 
 ## Events

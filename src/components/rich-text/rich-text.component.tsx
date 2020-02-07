@@ -1,6 +1,5 @@
 import { Component, Element, Event, EventEmitter, h, Method, Prop, State } from '@stencil/core';
-import { allowedConfig } from '../../utils/allowed-config';
-import { EditorUtils } from '../../utils/editor-utils';
+import { EditorUtils, allowedConfig, GetFontFaces } from '../../utils/';
 import { RichTextEditorOptions } from './rich-text.interface';
 import { Icons } from '../icons/icons';
 
@@ -52,7 +51,7 @@ export class HiveRichTextComponent {
     }
 
     // customize
-    @Prop() options: Partial<RichTextEditorOptions> = {
+    @Prop() options: RichTextEditorOptions = {
         placeholder: 'Insert text...'
     };
 
@@ -905,7 +904,7 @@ export class HiveRichTextComponent {
             html.style.fontSize = (this.options.font) ? this.options.font.size : this.font.size;
             html.style.color = (this.options.font) ? this.options.font.color : this.font.color;
 
-            if (this.options.font && this.options.font.url && this.options.font.family) {
+            if (this.options.font && this.options.font.family && this.options.font.faces) {
                 const meta: HTMLMetaElement = this.iframe.contentDocument.createElement('meta');
                 meta.setAttribute('charset', 'utf-8');
                 this.iframe.contentDocument.head.appendChild(meta);
@@ -915,10 +914,7 @@ export class HiveRichTextComponent {
                 this.iframe.contentDocument.head.appendChild(base);
 
                 const style: HTMLStyleElement = this.iframe.contentDocument.createElement('style');
-                style.innerHTML = `@font-face {
-                        font-family: '${this.options.font.family}';
-                        src: url('${this.options.font.url}') format('${this.options.font.format}')
-                }`;
+                style.innerHTML = GetFontFaces(this.options.font.family, this.options.font.faces);
                 this.iframe.contentDocument.head.appendChild(style);
 
                 html.style.fontFamily = this.options.font.family;
