@@ -9,7 +9,7 @@
 import { HTMLStencilElement, JSXBase } from '@stencil/core/internal';
 import {
   RichTextEditorOptions,
-} from './utils/options.interface';
+} from './components/rich-text/rich-text.interface';
 
 export namespace Components {
   interface HiveColorPopover {
@@ -26,7 +26,7 @@ export namespace Components {
     'fontSmoothing': boolean;
     'getContent': () => Promise<{ text: string; html: string; }>;
     'hiveFocus': () => Promise<void>;
-    'options': Partial<RichTextEditorOptions>;
+    'options': RichTextEditorOptions;
     'setContent': (value: string) => Promise<void>;
   }
 }
@@ -81,7 +81,7 @@ declare namespace LocalJSX {
     * The text change event when the user releases a key-up event in the text area
     */
     'onTextChange'?: (event: CustomEvent<any>) => void;
-    'options'?: Partial<RichTextEditorOptions>;
+    'options'?: RichTextEditorOptions;
   }
 
   interface IntrinsicElements {

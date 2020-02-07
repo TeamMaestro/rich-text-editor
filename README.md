@@ -43,7 +43,32 @@ Where `options` can be populated with any of the following properties:
 |`placeholder`|`Insert text...`|The text that will display when the rich editor is unfocused in the empty state.|`string`|
 |`showToolbar`|`always`|How the toolbar should be shown or hidden based on user actions |`always`, `onHover`, or `onSelect`|
 |`autoFocus`|`false`|To focus on the text component upon init.|`boolean`|
-|`font: {`</br>`family,`</br>`url,`<br>`format,`<br>`size,`</br>`color,`</br>`};`| `family: Arial`</br>`url: null`<br>`format: null`<br>`size: 12px`</br>`color: #626272` | To set what the font variables will be in the rich text editor. When passing through a custom font, the url will need to be the location of the font asset in relation to where its loaded when served (ex. './arial.otf' when found at https://localhost:4200/arial.otf). The format needs to be whatever the font asset format is (ex. 'woff2', 'otf', etc) in order to load correctly. | `family: string`</br>`url: string`<br>`format: string`<br>`size: string`</br>`color: string`
+|`font: {`</br>`family,`<br>`size,`</br>`color,`</br>`faces`</br>`};`| `family: Arial`</br>`size: 12px`</br>`color: #626272`</br>`faces: null` | To set what the font variables will be in the rich text editor. | `family: string`<br>`size: string`</br>`color: string`</br>`faces: FontFace[]`
+
+The `font` option allows for custom `FontFace` to be configured like this:
+
+```
+faces: [
+    {
+        weight: 400,
+        style: 'normal',
+        src: ['./SomeFont.ttf', './SomeFont.woff']
+    },
+    {
+        weight: 400,
+        style: 'italic',
+        src: ['./SomeFont-Italic.ttf', './SomeFont-Italic.woff']
+    },
+    {
+        weight: 500,
+        style: 'normal',
+        src: './SomeFont-Bold.ttf'
+    },
+    ...
+]
+```
+
+You should define each weight and style separately similar to how you would define them in CSS using `@font-face`. You can also specific multiple file urls for `src` and they will each be specified in the `font-face` rule. If you just set `src` to a single url, it will be the only one used.
 
 &nbsp;
 
