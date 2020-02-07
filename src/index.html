@@ -42,47 +42,6 @@
 <script>
     var rte = document.querySelector('hive-rich-text');
 
-    rte.options = {
-        position: 'bottom',
-        showToolbar: 'onSelect',
-        font: {
-            family: 'Larsseit',
-            size: '16px',
-            faces: [
-                {
-                    weight: 400,
-                    style: 'normal',
-                    src: ['./Larsseit.ttf', './Larsseit.woff']
-                },
-                {
-                    weight: 400,
-                    style: 'italic',
-                    src: ['./Larsseit-Italic.ttf', './Larsseit-Italic.woff']
-                },
-                {
-                    weight: 500,
-                    style: 'normal',
-                    src: ['./Larsseit-Medium.ttf', './Larsseit-Medium.woff']
-                },
-                {
-                    weight: 500,
-                    style: 'italic',
-                    src: ['./Larsseit-MediumItalic.ttf', './Larsseit-MediumItalic.woff']
-                },
-                {
-                    weight: 700,
-                    style: 'normal',
-                    src: ['./Larsseit-Bold.ttf', './Larsseit-Bold.woff']
-                },
-                {
-                    weight: 700,
-                    style: 'italic',
-                    src: ['./Larsseit-BoldItalic.ttf', './Larsseit-BoldItalic.woff']
-                }
-            ]
-        }
-    }
-
     var preview = document.querySelector('#preview');
 
     rte.addEventListener('textChange', function(data) {
