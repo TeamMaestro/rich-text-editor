@@ -52,7 +52,8 @@ export class HiveRichTextComponent {
 
     // customize
     @Prop() options: RichTextEditorOptions = {
-        placeholder: 'Insert text...'
+        placeholder: 'Insert text...',
+        maxLength: 20
     };
 
     // states
@@ -195,10 +196,8 @@ export class HiveRichTextComponent {
 
         // prevent entering past the maxLength
         else if (
-            (
-                !isSpecialKey(event.keyCode)            // allow non-typing keys
-                || !isKey(event.keyCode, 'Backspace')   // allow backspacing
-            )
+            !isSpecialKey(event.keyCode)            // allow non-typing keys
+            && !isKey(event.keyCode, 'Backspace')   // allow backspacing
             && (this.options.maxLength && this.options.maxLength <= (event.target as HTMLElement).innerText.length)
         ) {
             event.preventDefault();
