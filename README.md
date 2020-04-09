@@ -41,6 +41,7 @@ Where `options` can be populated with any of the following properties:
 |`position`|`top`|The position of the toolbar in relation to the text container.|`top` or `bottom`|
 |`content`|`null`|The content that will be loaded into the text container upon loading.|`plain text` and/or `html text` as a `string`|
 |`placeholder`|`Insert text...`|The text that will display when the rich editor is unfocused in the empty state.|`string`|
+|`maxLength`|`undefined`|The maximum number of available characters, if set.| `number` |
 |`showToolbar`|`always`|How the toolbar should be shown or hidden based on user actions |`always`, `onHover`, or `onSelect`|
 |`autoFocus`|`false`|To focus on the text component upon init.|`boolean`|
 |`font: {`</br>`family,`<br>`size,`</br>`color,`</br>`faces`</br>`};`| `family: Arial`</br>`size: 12px`</br>`color: #626272`</br>`faces: null` | To set what the font variables will be in the rich text editor. | `family: string`<br>`size: string`</br>`color: string`</br>`faces: FontFace[]`
