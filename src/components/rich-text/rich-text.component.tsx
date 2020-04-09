@@ -115,6 +115,7 @@ export class HiveRichTextComponent {
         this.iframe.contentDocument['onkeydown'] = (event: KeyboardEvent) => this.keydown(event);
         this.iframe.contentDocument['onmousedown'] = (event: MouseEvent) => this.mousedown(event);
         this.iframe.contentDocument['touchstart'] = (event: MouseEvent) => this.touchstart(event);
+        this.iframe.contentDocument['onpaste'] = (event: ClipboardEvent) => this.paste(event);
 
         this.iframe.contentDocument.body['onfocus'] = () => {
             this.focused = true;
@@ -228,6 +229,34 @@ export class HiveRichTextComponent {
 
     touchstart(event: MouseEvent) {
         this.anchorEvent = event;
+    }
+
+    paste(event: ClipboardEvent) {
+        if (this.iframe) {
+           const length = (event.target as HTMLElement).innerText.length;
+           const data = event.clipboardData.getData('text/plain');
+
+           // if data will not fit into available space,
+           // trim it down to fit and perform custom paste
+            if (this.options.maxLength && (this.options.maxLength < (length + data.length))) {
+
+                // max length + length of section being replaced - current length
+                const availableLength = this.options.maxLength
+                    + this.iframe.contentDocument.getSelection().getRangeAt(0).toString().length
+                    - length;
+
+                // delete current selection
+                this.iframe.contentDocument.getSelection().deleteFromDocument();
+
+                // add as much of clipboard data as can fit
+                this.iframe.contentDocument.createTextNode(
+                    data.slice(0, availableLength > 0 ? availableLength : 0)
+                );
+
+                // stop default paste
+                event.preventDefault();
+           }
+        }
     }
 
     checkForEmpty() {
