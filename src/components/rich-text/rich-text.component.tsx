@@ -195,9 +195,11 @@ export class HiveRichTextComponent {
 
         // prevent entering past the maxLength
         else if (
-            !isSpecialKey(event.keyCode)            // allow non-typing keys
-            || !isKey(event.keyCode, 'Backspace')   // allow backspacing
-            && this.options.maxLength <= (event.target as HTMLElement).innerText.length
+            (
+                !isSpecialKey(event.keyCode)            // allow non-typing keys
+                || !isKey(event.keyCode, 'Backspace')   // allow backspacing
+            )
+            && (this.options.maxLength && this.options.maxLength <= (event.target as HTMLElement).innerText.length)
         ) {
             event.preventDefault();
         }
