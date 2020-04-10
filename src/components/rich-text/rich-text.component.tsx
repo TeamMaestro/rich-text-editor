@@ -235,24 +235,29 @@ export class HiveRichTextComponent {
     paste(event: ClipboardEvent) {
         if (this.iframe) {
            const length = (event.target as HTMLElement).innerText.length;
-           const data = event.clipboardData.getData('text/plain');
+           const text = event.clipboardData.getData('text/plain');
 
-           // if data will not fit into available space,
+           // if text will not fit into available space,
            // trim it down to fit and perform custom paste
-            if (this.options.maxLength && (this.options.maxLength < (length + data.length))) {
+            if (this.options.maxLength && (this.options.maxLength < (length + text.length))) {
 
-                // max length + length of section being replaced - current length
-                const availableLength = this.options.maxLength
-                    + this.iframe.contentDocument.getSelection().getRangeAt(0).toString().length
-                    - length;
+                const range = this.iframe.contentDocument.getSelection().getRangeAt(0);
 
-                // delete current selection
-                this.iframe.contentDocument.getSelection().deleteFromDocument();
+                // delete current range contents
+                range.deleteContents();
 
                 // add as much of clipboard data as can fit
-                this.iframe.contentDocument.createTextNode(
-                    data.slice(0, availableLength > 0 ? availableLength : 0)
+                const availableLength = this.options.maxLength + range.toString().length - length;
+                const textNode = this.iframe.contentDocument.createTextNode(
+                    text.slice(0, availableLength > 0 ? availableLength : 0)
                 );
+                range.insertNode(textNode);
+                
+                // set cursor to end of new text
+                range.setStart(textNode, textNode.length);
+                range.setEnd(textNode, textNode.length);
+                this.iframe.contentDocument.getSelection().removeAllRanges();
+                this.iframe.contentDocument.getSelection().addRange(range);
 
                 // stop default paste
                 event.preventDefault();
