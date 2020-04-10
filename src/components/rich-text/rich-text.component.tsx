@@ -52,8 +52,7 @@ export class HiveRichTextComponent {
 
     // customize
     @Prop() options: RichTextEditorOptions = {
-        placeholder: 'Insert text...',
-        maxLength: 20
+        placeholder: 'Insert text...'
     };
 
     // states
