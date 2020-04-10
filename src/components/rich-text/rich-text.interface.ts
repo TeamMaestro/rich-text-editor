@@ -8,6 +8,8 @@ export interface RichTextEditorOptions {
 
     placeholder?: string; // what to display when the text box is empty
 
+    maxLength?: number // total number of available plain-text characters
+
     showToolbar?:
     'always' | // always show the toolbar. Default behavior
     'onHover' | // only have the toolbar appear when you are hovering over the text container

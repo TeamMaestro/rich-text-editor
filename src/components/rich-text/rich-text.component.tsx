@@ -1,5 +1,5 @@
 import { Component, Element, Event, EventEmitter, h, Method, Prop, State } from '@stencil/core';
-import { EditorUtils, allowedConfig, GetFontFaces } from '../../utils/';
+import { EditorUtils, allowedConfig, GetFontFaces, isOSKey, keys, isKey, isSpecialKey } from '../../utils/';
 import { RichTextEditorOptions } from './rich-text.interface';
 import { Icons } from '../icons/icons';
 
@@ -115,6 +115,7 @@ export class HiveRichTextComponent {
         this.iframe.contentDocument['onkeydown'] = (event: KeyboardEvent) => this.keydown(event);
         this.iframe.contentDocument['onmousedown'] = (event: MouseEvent) => this.mousedown(event);
         this.iframe.contentDocument['touchstart'] = (event: MouseEvent) => this.touchstart(event);
+        this.iframe.contentDocument['onpaste'] = (event: ClipboardEvent) => this.paste(event);
 
         this.iframe.contentDocument.body['onfocus'] = () => {
             this.focused = true;
@@ -144,22 +145,22 @@ export class HiveRichTextComponent {
     }
 
     keydown(event: KeyboardEvent) {
-        if (event.keyCode === 91 || event.keyCode === 93) { // keycode control button
+        if (isOSKey(event.keyCode)) { // keycode control button
             this.keycodeDown = event.keyCode;
-        } else if (this.keycodeDown === 91 || this.keycodeDown === 93) {
+        } else if (isOSKey(this.keycodeDown)) {
             switch (event.keyCode) {
-                case 66:
+                case keys['KeyB']:
                     this.toggleActiveState('bold');
                     break;
-                case 73:
+                case keys['KeyI']:
                     this.toggleActiveState('italic');
                     break;
-                case 85:
+                case keys['KeyU']:
                     this.style('underline');
                     this.toggleActiveState('underline');
                     break;
             }
-        } else if (event.keyCode === 13) {
+        } else if (isKey(event.keyCode, 'Enter')) {
             const thisListItem = this.iframe.contentDocument.getSelection().focusNode.parentElement.closest('li') || this.iframe.contentDocument.getSelection().focusNode;
 
             const list = thisListItem.parentElement;
@@ -172,7 +173,7 @@ export class HiveRichTextComponent {
                     }
                 }
         }
-        else if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+        else if (isKey(event.keyCode, ['ArrowUp', 'ArrowDown'])) {
 
             // Handle the cursor position if the list is at the beginning or the end of the document
             const thisListItem = this.iframe.contentDocument.getSelection().focusNode.parentElement.closest('li');
@@ -180,16 +181,26 @@ export class HiveRichTextComponent {
                 const list = thisListItem.parentElement;
 
                 if (list != null) {
-                    if (event.key === 'ArrowUp' && list.children[0] === thisListItem && list.previousSibling == null) {
+                    if (isKey(event.keyCode, 'ArrowUp') && list.children[0] === thisListItem && list.previousSibling == null) {
                         const startBreak = this.iframe.contentDocument.createElement('br');
                         this.iframe.contentDocument.body.insertBefore(startBreak, list);
                     }
-                    else if (event.key === 'ArrowDown' && list.children[list.childElementCount - 1] === thisListItem && list.nextSibling == null) {
+                    else if (isKey(event.keyCode, 'ArrowDown') && list.children[list.childElementCount - 1] === thisListItem && list.nextSibling == null) {
                         const endBreak = this.iframe.contentDocument.createElement('br');
                         this.iframe.contentDocument.body.appendChild(endBreak);
                     }
                 }
             }
+        }
+
+        // prevent entering past the maxLength
+        else if (
+            !isSpecialKey(event.keyCode)            // allow non-typing keys
+            && !isKey(event.keyCode, 'Backspace')   // allow backspacing
+            && this.iframe.contentDocument.getSelection().getRangeAt(0).toString().length === 0 // allow typing over (replacing) selected text
+            && (this.options.maxLength && this.options.maxLength <= (event.target as HTMLElement).innerText.length)
+        ) {
+            event.preventDefault();
         }
     }
 
@@ -209,7 +220,7 @@ export class HiveRichTextComponent {
             }
         }
 
-        if (event.keyCode === 91 || this.keycodeDown === 93) {
+        if (isKey(event.keyCode, 'OSLeft') || isKey(this.keycodeDown, 'OSRight')) {
             this.keycodeDown = null;
         }
 
@@ -219,6 +230,41 @@ export class HiveRichTextComponent {
 
     touchstart(event: MouseEvent) {
         this.anchorEvent = event;
+    }
+
+    paste(event: ClipboardEvent) {
+        if (this.iframe) {
+           const length = (event.target as HTMLElement).innerText.length;
+           const text = event.clipboardData.getData('text/plain');
+
+           // if text will not fit into available space,
+           // trim it down to fit and perform custom paste
+            if (this.options.maxLength && (this.options.maxLength < (length + text.length))) {
+
+                const range = this.iframe.contentDocument.getSelection().getRangeAt(0);
+
+                // max length + length of section being replaced - current length
+                const availableLength = this.options.maxLength + range.toString().length - length;
+
+                // delete current range contents
+                range.deleteContents();
+
+                // add as much of clipboard data as can fit
+                const textNode = this.iframe.contentDocument.createTextNode(
+                    text.slice(0, availableLength > 0 ? availableLength : 0)
+                );
+                range.insertNode(textNode);
+                
+                // set cursor to end of new text
+                range.setStart(textNode, textNode.length);
+                range.setEnd(textNode, textNode.length);
+                this.iframe.contentDocument.getSelection().removeAllRanges();
+                this.iframe.contentDocument.getSelection().addRange(range);
+
+                // stop default paste
+                event.preventDefault();
+           }
+        }
     }
 
     checkForEmpty() {
