@@ -198,6 +198,7 @@ export class HiveRichTextComponent {
         else if (
             !isSpecialKey(event.keyCode)            // allow non-typing keys
             && !isKey(event.keyCode, 'Backspace')   // allow backspacing
+            && this.iframe.contentDocument.getSelection().getRangeAt(0).toString().length === 0 // allow typing over (replacing) selected text
             && (this.options.maxLength && this.options.maxLength <= (event.target as HTMLElement).innerText.length)
         ) {
             event.preventDefault();
@@ -243,11 +244,13 @@ export class HiveRichTextComponent {
 
                 const range = this.iframe.contentDocument.getSelection().getRangeAt(0);
 
+                // max length + length of section being replaced - current length
+                const availableLength = this.options.maxLength + range.toString().length - length;
+
                 // delete current range contents
                 range.deleteContents();
 
                 // add as much of clipboard data as can fit
-                const availableLength = this.options.maxLength + range.toString().length - length;
                 const textNode = this.iframe.contentDocument.createTextNode(
                     text.slice(0, availableLength > 0 ? availableLength : 0)
                 );
