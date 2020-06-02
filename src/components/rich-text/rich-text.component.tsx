@@ -1,4 +1,4 @@
-import { Component, Element, Event, EventEmitter, h, Method, Prop, State } from '@stencil/core';
+import { Component, Element, Event, EventEmitter, h, Method, Prop, State, Watch } from '@stencil/core';
 import { EditorUtils, allowedConfig, GetFontFaces, isOSKey, keys, isKey, isSpecialKey } from '../../utils/';
 import { RichTextEditorOptions } from './rich-text.interface';
 import { Icons } from '../icons/icons';
@@ -20,16 +20,27 @@ export class HiveRichTextComponent {
     @State() highlightOpen = false;
     @State() linkPopoverOpen = false;
     @State() focused = false;
+    @Watch('focused')
+    protected onFocusChange() {
+        if (this.focused) {
+            this.rteFocus.emit();
+        }
+        else {
+            this.rteBlur.emit();
+        }
+    }
 
     /**
      * The text change event when the user releases a key-up event in the text area
      */
     @Event() textChange: EventEmitter;
-
     /**
      * The style change event when the user clicks to apply a new style
      */
     @Event() styleChange: EventEmitter;
+
+    @Event() rteFocus: EventEmitter<void>;
+    @Event() rteBlur: EventEmitter<void>;
 
     linkPopover: HTMLHiveLinkPopoverElement;
     linkPopoverTopOffset: number = 40;
@@ -41,6 +52,7 @@ export class HiveRichTextComponent {
     keycodeDown: number;
     addedToToolbar: string[] = [];
 
+    allowCustomColor = true;
     colors = ['#FF4541', '#E65100', '#43A047', '#1C9BE6', '#6446EB', '#ACACC2', '#626272']; // default colors for text color selection
     highlights = ['#f3f315', '#ff0099', '#83f52c', '#ff6600', '#6e0dd0']; // default colors for highlighting selection
     toolbar = ['bold', 'italic', 'underline', 'strikethrough', '|', 'color', 'highlight', '|', 'link', '|', 'orderedList', 'unorderedList']; // what components to render in the corresponding order
@@ -236,6 +248,9 @@ export class HiveRichTextComponent {
         if (this.iframe) {
            const length = (event.target as HTMLElement).innerText.length;
            const text = event.clipboardData.getData('text/plain');
+            
+           console.log('the content', event.clipboardData.getData('text/html'))
+
 
            // if text will not fit into available space,
            // trim it down to fit and perform custom paste
@@ -267,6 +282,8 @@ export class HiveRichTextComponent {
         }
     }
 
+    // sanitizeHtml()
+
     checkForEmpty() {
         const html = this.iframe.contentDocument.body.innerHTML;
         if (html.length < 1) {
@@ -292,7 +309,7 @@ export class HiveRichTextComponent {
                             <div id={component} class={component + ' button'} onClick={() => this.onColorClick(!this.colorOpen, 'color')}>
                                 {Icons.color}
                             </div>
-                            <hive-color-popover hidden={!this.colorOpen} position={this.options.position} isOpen={this.colorOpen} colors={this.colors} onColorSelected={($event: CustomEvent<string>) => this.submitInput('color', $event.detail)}></hive-color-popover>
+                            <hive-color-popover hidden={!this.colorOpen} position={this.options.position} isOpen={this.colorOpen} colors={this.colors} allowCustomColor={this.allowCustomColor} onColorSelected={($event: CustomEvent<string>) => this.submitInput('color', $event.detail)}></hive-color-popover>
                         </div>
                     this.addedToToolbar.push(component);
                     break;
@@ -1001,6 +1018,10 @@ export class HiveRichTextComponent {
         if (this.options) {
             if (this.options.colors) {
                 this.colors = this.options.colors;
+            }
+
+            if (this.options.allowCustomColor != null) {
+                this.allowCustomColor = this.options.allowCustomColor;
             }
 
             if (this.options.highlights) {

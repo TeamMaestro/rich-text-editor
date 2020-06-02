@@ -21,6 +21,11 @@ export class ColorPopoverComponent {
     }
   }
 
+  /**
+   * `true` if user can input a custom color.
+   */
+  @Prop() allowCustomColor = true;
+
   @Event() colorSelected: EventEmitter;
   colorSelectedHandler(color: string) {
     this.colorSelected.emit(color);
@@ -68,6 +73,26 @@ export class ColorPopoverComponent {
     this.updateSelectorColor();
   }
 
+  private renderCustomColorPicker() {
+    if (!this.allowCustomColor) {
+      return;
+    }
+
+    return (
+      <div class='color-picker-container'>
+        <div id='hex-color-selector' class='color-selector empty' style={{
+          backgroundColor: '#fff'
+        }}></div>
+        <input type='text'
+          id='color-input'
+          placeholder='#HEX'
+          onInput={() => this.updateSelectorColor()}
+          onKeyUp={($event: KeyboardEvent) => this.onAction(null, $event)}>
+        </input>
+      </div>
+    )
+  }
+
   render() {
     return [
       <div class={this.position + ' arrow'}></div>,
@@ -80,17 +105,7 @@ export class ColorPopoverComponent {
             return <div class='color-selector' style={style} onClick={() => this.onAction(color)}></div>
           })}
         </div>
-        <div class='color-picker-container'>
-          <div id='hex-color-selector' class='color-selector empty' style={{
-            backgroundColor: '#fff'
-          }}></div>
-          <input type='text'
-            id='color-input'
-            placeholder='#HEX'
-            onInput={() => this.updateSelectorColor()}
-            onKeyUp={($event: KeyboardEvent) => this.onAction(null, $event)}>
-          </input>
-        </div>
+        {this.renderCustomColorPicker()}
       </div>
     ];
   }

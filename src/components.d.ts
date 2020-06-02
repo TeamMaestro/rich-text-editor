@@ -13,6 +13,10 @@ import {
 
 export namespace Components {
   interface HiveColorPopover {
+    /**
+    * `true` if user can input a custom color.
+    */
+    'allowCustomColor': boolean;
     'colors': string[];
     'isOpen': boolean;
     'position': 'top' | 'bottom';
@@ -60,6 +64,10 @@ declare global {
 
 declare namespace LocalJSX {
   interface HiveColorPopover {
+    /**
+    * `true` if user can input a custom color.
+    */
+    'allowCustomColor'?: boolean;
     'colors'?: string[];
     'isOpen'?: boolean;
     'onColorSelected'?: (event: CustomEvent<any>) => void;
@@ -73,6 +81,8 @@ declare namespace LocalJSX {
   }
   interface HiveRichText {
     'fontSmoothing'?: boolean;
+    'onRteBlur'?: (event: CustomEvent<void>) => void;
+    'onRteFocus'?: (event: CustomEvent<void>) => void;
     /**
     * The style change event when the user clicks to apply a new style
     */
