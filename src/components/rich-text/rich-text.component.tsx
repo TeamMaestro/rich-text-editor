@@ -1,4 +1,4 @@
-import { Component, Element, Event, EventEmitter, h, Method, Prop, State } from '@stencil/core';
+import { Component, Element, Event, EventEmitter, h, Method, Prop, State, Watch } from '@stencil/core';
 import { EditorUtils, allowedConfig, GetFontFaces, isOSKey, keys, isKey, isSpecialKey } from '../../utils/';
 import { RichTextEditorOptions } from './rich-text.interface';
 import { Icons } from '../icons/icons';
@@ -20,16 +20,27 @@ export class HiveRichTextComponent {
     @State() highlightOpen = false;
     @State() linkPopoverOpen = false;
     @State() focused = false;
+    @Watch('focused')
+    protected onFocusChange() {
+        if (this.focused) {
+            this.rteFocus.emit();
+        }
+        else {
+            this.rteBlur.emit();
+        }
+    }
 
     /**
      * The text change event when the user releases a key-up event in the text area
      */
     @Event() textChange: EventEmitter;
-
     /**
      * The style change event when the user clicks to apply a new style
      */
     @Event() styleChange: EventEmitter;
+
+    @Event() rteFocus: EventEmitter<void>;
+    @Event() rteBlur: EventEmitter<void>;
 
     linkPopover: HTMLHiveLinkPopoverElement;
     linkPopoverTopOffset: number = 40;
@@ -237,6 +248,9 @@ export class HiveRichTextComponent {
         if (this.iframe) {
            const length = (event.target as HTMLElement).innerText.length;
            const text = event.clipboardData.getData('text/plain');
+            
+           console.log('the content', event.clipboardData.getData('text/html'))
+
 
            // if text will not fit into available space,
            // trim it down to fit and perform custom paste
@@ -267,6 +281,8 @@ export class HiveRichTextComponent {
            }
         }
     }
+
+    // sanitizeHtml()
 
     checkForEmpty() {
         const html = this.iframe.contentDocument.body.innerHTML;

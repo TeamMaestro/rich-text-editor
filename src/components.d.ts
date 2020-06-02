@@ -81,6 +81,8 @@ declare namespace LocalJSX {
   }
   interface HiveRichText {
     'fontSmoothing'?: boolean;
+    'onRteBlur'?: (event: CustomEvent<void>) => void;
+    'onRteFocus'?: (event: CustomEvent<void>) => void;
     /**
     * The style change event when the user clicks to apply a new style
     */
