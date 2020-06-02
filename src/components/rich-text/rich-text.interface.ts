@@ -1,6 +1,7 @@
 export interface RichTextEditorOptions {
     toolbar?: string[]; // what components to render in the corresponding order
     colors?: string[]; // default colors for text color selection
+    allowCustomColor?: boolean; // whether or not the user can input a custom color in the picker
     highlights?: string[]; // default colors for highlighting selection
 
     position?: 'top' | 'bottom'; // position of the bar. ('top' || 'bottom')

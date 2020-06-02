@@ -13,6 +13,10 @@ import {
 
 export namespace Components {
   interface HiveColorPopover {
+    /**
+    * `true` if user can input a custom color.
+    */
+    'allowCustomColor': boolean;
     'colors': string[];
     'isOpen': boolean;
     'position': 'top' | 'bottom';
@@ -60,6 +64,10 @@ declare global {
 
 declare namespace LocalJSX {
   interface HiveColorPopover {
+    /**
+    * `true` if user can input a custom color.
+    */
+    'allowCustomColor'?: boolean;
     'colors'?: string[];
     'isOpen'?: boolean;
     'onColorSelected'?: (event: CustomEvent<any>) => void;
