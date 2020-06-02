@@ -17,7 +17,9 @@ export class ColorPopoverComponent {
   openHandler(newValue: boolean) {
     if (newValue) {
       const input = this.el.shadowRoot.querySelector('#color-input') as HTMLInputElement;
-      input.focus();
+      if (input) {
+        input.focus();
+      }
     }
   }
 
@@ -35,7 +37,9 @@ export class ColorPopoverComponent {
   colorValidation = /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i; // this ensures that the input matches hex code values for a valid color
 
   onAction(data: string, event?: KeyboardEvent) {
-    this.updateSelectorColor();
+    if (this.allowCustomColor) {
+      this.updateSelectorColor();
+    }
 
     if (event) {
       if (event.keyCode === 13) {
@@ -68,9 +72,10 @@ export class ColorPopoverComponent {
 
   reset() {
     const input = this.el.shadowRoot.querySelector('#color-input') as HTMLInputElement;
-    input.value = '';
-
-    this.updateSelectorColor();
+    if (input) {
+      input.value = '';
+      this.updateSelectorColor();
+    }
   }
 
   private renderCustomColorPicker() {
