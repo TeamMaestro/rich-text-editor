@@ -248,9 +248,6 @@ export class HiveRichTextComponent {
         if (this.iframe) {
            const length = (event.target as HTMLElement).innerText.length;
            const text = event.clipboardData.getData('text/plain');
-            
-           console.log('the content', event.clipboardData.getData('text/html'))
-
 
            // if text will not fit into available space,
            // trim it down to fit and perform custom paste
@@ -281,8 +278,6 @@ export class HiveRichTextComponent {
            }
         }
     }
-
-    // sanitizeHtml()
 
     checkForEmpty() {
         const html = this.iframe.contentDocument.body.innerHTML;
