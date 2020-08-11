@@ -962,6 +962,12 @@ export class HiveRichTextComponent {
             html.style.fontSize = (this.options.font) ? this.options.font.size : this.font.size;
             html.style.color = (this.options.font) ? this.options.font.color : this.font.color;
 
+            // Set editor stylesheet
+            var css = document.createElement('style'); 
+            css.type = 'text/css';
+            css.appendChild(document.createTextNode('img { max-width: 100% }'));
+            html.getElementsByTagName("head")[0].appendChild(css);
+
             if (this.options.font && this.options.font.family && this.options.font.faces) {
                 const meta: HTMLMetaElement = this.iframe.contentDocument.createElement('meta');
                 meta.setAttribute('charset', 'utf-8');
