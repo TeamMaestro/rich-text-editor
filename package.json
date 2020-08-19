@@ -1,6 +1,6 @@
 {
     "name": "@teamhive/rich-text-editor",
-    "version": "2.3.1",
+    "version": "2.3.2",
     "description": "Rich text editor web component. Built with Stencil.",
     "homepage": "https://github.com/TeamHive/rich-text-editor",
     "repository": {
@@ -21,7 +21,7 @@
         "loader/"
     ],
     "scripts": {
-        "build": "stencil build --docs",
+        "build": "stencil build --prod",
         "start": "stencil build --dev --watch --serve",
         "test": "stencil test --spec --e2e",
         "test.watch": "stencil test --spec --e2e --watchAll",

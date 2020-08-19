@@ -266,7 +266,7 @@ export class HiveRichTextComponent {
                     text.slice(0, availableLength > 0 ? availableLength : 0)
                 );
                 range.insertNode(textNode);
-                
+
                 // set cursor to end of new text
                 range.setStart(textNode, textNode.length);
                 range.setEnd(textNode, textNode.length);
@@ -276,6 +276,8 @@ export class HiveRichTextComponent {
                 // stop default paste
                 event.preventDefault();
            }
+           // Wait a single tick for the iframe contents to render
+           setTimeout(() => this.textChange.emit(event));
         }
     }
 
@@ -963,7 +965,7 @@ export class HiveRichTextComponent {
             html.style.color = (this.options.font) ? this.options.font.color : this.font.color;
 
             // Set editor stylesheet
-            var css = document.createElement('style'); 
+            var css = document.createElement('style');
             css.type = 'text/css';
             css.appendChild(document.createTextNode('img { max-width: 100% }'));
             html.getElementsByTagName("head")[0].appendChild(css);

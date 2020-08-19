@@ -15,10 +15,12 @@
 
 ## Events
 
-| Event         | Description                                                                  | Type               |
-| ------------- | ---------------------------------------------------------------------------- | ------------------ |
-| `styleChange` | The style change event when the user clicks to apply a new style             | `CustomEvent<any>` |
-| `textChange`  | The text change event when the user releases a key-up event in the text area | `CustomEvent<any>` |
+| Event         | Description                                                                  | Type                |
+| ------------- | ---------------------------------------------------------------------------- | ------------------- |
+| `rteBlur`     |                                                                              | `CustomEvent<void>` |
+| `rteFocus`    |                                                                              | `CustomEvent<void>` |
+| `styleChange` | The style change event when the user clicks to apply a new style             | `CustomEvent<any>`  |
+| `textChange`  | The text change event when the user releases a key-up event in the text area | `CustomEvent<any>`  |
 
 
 ## Methods

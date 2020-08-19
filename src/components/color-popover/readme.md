@@ -7,11 +7,12 @@
 
 ## Properties
 
-| Property   | Attribute  | Description | Type                | Default     |
-| ---------- | ---------- | ----------- | ------------------- | ----------- |
-| `colors`   | --         |             | `string[]`          | `undefined` |
-| `isOpen`   | `is-open`  |             | `boolean`           | `undefined` |
-| `position` | `position` |             | `"bottom" \| "top"` | `undefined` |
+| Property           | Attribute            | Description                              | Type                | Default     |
+| ------------------ | -------------------- | ---------------------------------------- | ------------------- | ----------- |
+| `allowCustomColor` | `allow-custom-color` | `true` if user can input a custom color. | `boolean`           | `true`      |
+| `colors`           | --                   |                                          | `string[]`          | `undefined` |
+| `isOpen`           | `is-open`            |                                          | `boolean`           | `undefined` |
+| `position`         | `position`           |                                          | `"bottom" \| "top"` | `undefined` |
 
 
 ## Events
